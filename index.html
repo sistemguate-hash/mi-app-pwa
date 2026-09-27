@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Taller de Rebobinado — Ingresos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root {
+  --bg: #F3F1EC;
+  --bg-card: #FFFFFF;
+  --text: #1C2126;
+  --text-dim: #6B7480;
+  --accent: #B5622E;
+  --accent-soft: #F0DCC9;
+  --green: #4B7A63;
+  --green-soft: #DCE8E0;
+  --amber: #B48A2E;
+  --amber-soft: #F0E5C9;
+  --border: #DDD8CE;
+  --danger: #A8432F;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1B1E22; --bg-card: #24282D; --text: #EDEDEA; --text-dim: #9AA0A6;
+    --accent: #D98A4E; --accent-soft: #3A2C20; --green: #7FAF95; --green-soft: #223129;
+    --amber: #D9B65E; --amber-soft: #332C1B; --border: #34383D; --danger: #D9695A;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #1B1E22; --bg-card: #24282D; --text: #EDEDEA; --text-dim: #9AA0A6;
+  --accent: #D98A4E; --accent-soft: #3A2C20; --green: #7FAF95; --green-soft: #223129;
+  --amber: #D9B65E; --amber-soft: #332C1B; --border: #34383D; --danger: #D9695A;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font-family: 'IBM Plex Sans', system-ui, sans-serif;
+  scroll-padding-top: env(safe-area-inset-top, 0px);
+}
+.mono { font-family: 'IBM Plex Mono', monospace; }
+.wrap { max-width: 760px; margin: 0 auto; padding: 20px 16px 100px; }
+header { padding-top: env(safe-area-inset-top, 0px); }
+.title-row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 4px; }
+h1 { font-size: 21px; font-weight: 700; margin: 0; letter-spacing: -0.01em; }
+.sub { color: var(--text-dim); font-size: 13px; margin: 0 0 18px; }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 18px; }
+.stat { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+.stat b { display: block; font-size: 22px; font-weight: 700; }
+.stat span { font-size: 12px; color: var(--text-dim); }
+.controls { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; align-items: center; }
+input[type=text], input[type=search] {
+  background: var(--bg-card); border: 1px solid var(--border); color: var(--text);
+  border-radius: 8px; padding: 9px 12px; font-size: 14px; font-family: inherit; flex: 1; min-width: 140px;
+}
+.pills { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; margin-bottom: 14px; -webkit-overflow-scrolling: touch; }
+.pill {
+  border: 1px solid var(--border); background: var(--bg-card); color: var(--text-dim);
+  padding: 6px 12px; border-radius: 999px; font-size: 12.5px; white-space: nowrap; cursor: pointer;
+  font-weight: 500;
+}
+.pill.active { background: var(--text); color: var(--bg); border-color: var(--text); }
+button { font-family: inherit; cursor: pointer; }
+.btn-new {
+  background: var(--accent); color: #fff; border: none; border-radius: 9px;
+  padding: 10px 16px; font-size: 14px; font-weight: 600; width: 100%; margin-bottom: 16px;
+}
+.btn-new:active { opacity: 0.85; }
+.card {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px;
+  padding: 14px 14px 12px; margin-bottom: 10px; border-left: 3px solid var(--accent);
+}
+.card-top { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; }
+.ord { font-size: 12px; color: var(--text-dim); }
+.cliente { font-weight: 600; font-size: 15.5px; margin: 2px 0 3px; }
+.motor-line { font-size: 13.5px; color: var(--text-dim); }
+.falla { font-size: 13px; margin-top: 6px; }
+.card-bottom { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+.badge { font-size: 11.5px; font-weight: 600; padding: 4px 9px; border-radius: 999px; }
+.badge-Recibido { background: var(--amber-soft); color: var(--amber); }
+.badge-Diagnóstico { background: var(--amber-soft); color: var(--amber); }
+.badge-Rebobinado { background: var(--accent-soft); color: var(--accent); }
+.badge-Listo { background: var(--green-soft); color: var(--green); }
+.badge-Entregado { background: var(--border); color: var(--text-dim); }
+.total { font-weight: 600; font-size: 14px; }
+.detail { border-top: 1px solid var(--border); margin-top: 10px; padding-top: 10px; display: none; }
+.detail.open { display: block; }
+.row2 { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+select {
+  background: var(--bg-card); border: 1px solid var(--border); color: var(--text);
+  border-radius: 8px; padding: 7px 10px; font-size: 13px; font-family: inherit;
+}
+.detail-actions { display: flex; gap: 8px; margin-top: 8px; }
+.btn-sm {
+  border: 1px solid var(--border); background: transparent; color: var(--text-dim);
+  border-radius: 7px; padding: 7px 11px; font-size: 12.5px;
+}
+.btn-sm.danger { color: var(--danger); border-color: var(--danger); }
+.empty { text-align: center; color: var(--text-dim); font-size: 14px; padding: 40px 10px; }
+.overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.45); display: none;
+  align-items: flex-end; justify-content: center; z-index: 10;
+}
+.overlay.open { display: flex; }
+.sheet {
+  background: var(--bg-card); width: 100%; max-width: 760px; border-radius: 16px 16px 0 0;
+  padding: 18px 16px calc(20px + env(safe-area-inset-bottom, 0px)); max-height: 88vh; overflow-y: auto;
+}
+.sheet h2 { font-size: 17px; margin: 0 0 14px; }
+.field { margin-bottom: 11px; }
+.field label { display: block; font-size: 12.5px; color: var(--text-dim); margin-bottom: 4px; }
+.field input, .field select, .field textarea {
+  width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text);
+  border-radius: 8px; padding: 9px 11px; font-size: 14px; font-family: inherit;
+}
+.field textarea { resize: vertical; min-height: 50px; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.sheet-actions { display: flex; gap: 10px; margin-top: 14px; }
+.btn-primary {
+  background: var(--accent); color: #fff; border: none; border-radius: 9px;
+  padding: 11px; font-size: 14.5px; font-weight: 600; flex: 1;
+}
+.btn-cancel {
+  background: transparent; border: 1px solid var(--border); color: var(--text-dim);
+  border-radius: 9px; padding: 11px; font-size: 14.5px; flex: 0 0 90px;
+}
+.fotos-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+.foto-thumb { position: relative; width: 62px; height: 62px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); }
+.foto-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.foto-thumb .rm {
+  position: absolute; top: 2px; right: 2px; background: rgba(0,0,0,0.6); color: #fff;
+  border: none; border-radius: 50%; width: 18px; height: 18px; font-size: 12px; line-height: 1;
+}
+.foto-add {
+  width: 62px; height: 62px; border-radius: 8px; border: 1px dashed var(--border);
+  display: flex; align-items: center; justify-content: center; color: var(--text-dim);
+  font-size: 22px; background: transparent; position: relative; overflow: hidden;
+}
+.card-fotos { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+.card-fotos img { width: 52px; height: 52px; border-radius: 7px; object-fit: cover; border: 1px solid var(--border); }
+.lightbox {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none;
+  align-items: center; justify-content: center; z-index: 20; padding: 20px;
+}
+.lightbox.open { display: flex; }
+.lightbox img { max-width: 100%; max-height: 85vh; border-radius: 8px; }
+.btn-sm.busy { opacity: 0.6; pointer-events: none; }
+.mat-row {
+  display: flex; justify-content: space-between; align-items: center; gap: 8px;
+  background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+  padding: 7px 10px; margin-bottom: 6px;
+}
+.mat-row .mline { font-size: 13px; }
+.mat-row .mright { display: flex; align-items: center; gap: 8px; }
+.mat-row strong { font-size: 13px; }
+.chip-rm {
+  border: none; background: var(--border); color: var(--text); border-radius: 50%;
+  width: 20px; height: 20px; font-size: 12px; line-height: 1; flex-shrink: 0;
+}
+.cat-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); gap: 10px; }
+.mat-total { text-align: right; font-size: 13px; font-weight: 600; margin-top: 4px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="title-row"><h1>Taller de Rebobinado</h1></div>
+    <p class="sub">Ingresos y seguimiento de motores</p>
+  </header>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="controls">
+    <input type="search" id="search" placeholder="Buscar cliente o motor…">
+    <button type="button" class="btn-sm" id="btnCatalogo" style="white-space:nowrap;">📦 Materiales</button>
+  </div>
+  <div class="pills" id="pills"></div>
+
+  <button class="btn-new" id="btnNew">+ Nuevo ingreso</button>
+
+  <div id="list"></div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="sheet">
+    <h2 id="sheetTitle">Nuevo ingreso</h2>
+    <div class="field"><label>Cliente</label><input id="f-cliente" placeholder="Nombre del cliente"></div>
+    <div class="field"><label>Teléfono</label><input id="f-telefono" placeholder="Opcional"></div>
+    <div class="grid2">
+      <div class="field"><label>Tipo de motor</label>
+        <select id="f-tipo"><option>Monofásico</option><option>Trifásico</option></select>
+      </div>
+      <div class="field"><label>HP / kW</label><input id="f-potencia" placeholder="Ej. 5 HP"></div>
+    </div>
+    <div class="grid2">
+      <div class="field"><label>Voltaje</label><input id="f-voltaje" placeholder="Ej. 220V"></div>
+      <div class="field"><label>Marca</label><input id="f-marca" placeholder="Ej. WEG"></div>
+    </div>
+    <div class="field"><label>Falla reportada</label><textarea id="f-falla" placeholder="Descripción del problema"></textarea></div>
+    <div class="field">
+      <label>Materiales usados</label>
+      <div id="itemsMateriales"></div>
+      <div class="row2" style="flex-wrap:nowrap; margin-top:4px;">
+        <select id="matSelect" style="flex:1;"></select>
+        <input id="matCantidad" type="number" inputmode="decimal" placeholder="Cant." style="width:64px; flex:none;">
+        <button type="button" class="btn-sm" id="btnAddMat" style="flex:none;">+ Agregar</button>
+      </div>
+      <div class="mat-total">Total materiales: <span id="matTotalLabel">Q0</span></div>
+    </div>
+    <div class="field"><label>Horas mano de obra</label><input id="f-horas" type="number" inputmode="decimal" placeholder="0"></div>
+    <div class="field">
+      <label>Total presupuesto (Q)</label>
+      <div class="row2" style="flex-wrap:nowrap; align-items:center;">
+        <input id="f-total" type="number" inputmode="decimal" placeholder="0" style="flex:1;">
+        <button type="button" id="btnUsarMatTotal" class="btn-sm" style="flex:none; white-space:nowrap;">usar materiales</button>
+      </div>
+    </div>
+    <div class="field"><label>Notas</label><textarea id="f-notas" placeholder="Opcional"></textarea></div>
+    <div class="field">
+      <label>Fotos del motor</label>
+      <div class="fotos-row" id="fotosRow"></div>
+      <input type="file" id="f-foto-input" accept="image/*" capture="environment" style="display:none">
+      <input type="file" id="f-archivo-input" accept="image/*" multiple style="display:none">
+    </div>
+    <div class="sheet-actions">
+      <button class="btn-cancel" id="btnCancel">Cancelar</button>
+      <button class="btn-primary" id="btnSave">Guardar ingreso</button>
+    </div>
+  </div>
+</div>
+
+<div class="lightbox" id="lightbox"><img id="lightboxImg" src=""></div>
+
+<div class="overlay" id="catOverlay">
+  <div class="sheet">
+    <h2>Catálogo de materiales</h2>
+    <div class="grid2">
+      <div class="field"><label>Nombre</label><input id="cat-nombre" placeholder="Ej. Alambre esmaltado 18AWG"></div>
+      <div class="field"><label>Unidad</label><input id="cat-unidad" placeholder="Ej. lb, m, unidad"></div>
+    </div>
+    <div class="field"><label>Precio unitario (Q)</label><input id="cat-precio" type="number" inputmode="decimal" placeholder="0"></div>
+    <div class="sheet-actions">
+      <button class="btn-primary" id="btnCatSave">Agregar material</button>
+    </div>
+    <div id="catList" style="margin-top:16px;"></div>
+    <div class="sheet-actions" style="margin-top:14px;">
+      <button class="btn-cancel" id="btnCatClose" style="flex:1;">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const ESTADOS = ["Recibido", "Diagnóstico", "Rebobinado", "Listo", "Entregado"];
+let db = null;
+let downloadsCap = null;
+let ordenes = [];
+let filtroEstado = "Todos";
+let busqueda = "";
+let openId = null;
+let editId = null;
+let fotosActuales = [];
+let catalogo = [];
+let catEditId = null;
+let itemsActuales = [];
+
+function fmtQ(n) { n = Number(n) || 0; return "Q" + n.toLocaleString("es-GT", {minimumFractionDigits: 0}); }
+function fmtFecha(iso) {
+  const d = new Date(iso);
+  return d.toLocaleDateString("es-GT", { day: "2-digit", month: "short" });
+}
+
+function ordenNumero(id) {
+  const sorted = [...ordenes].sort((a,b) => new Date(a.fechaIngreso) - new Date(b.fechaIngreso));
+  const idx = sorted.findIndex(o => o.id === id);
+  return String(idx + 1).padStart(3, "0");
+}
+
+function render() {
+  renderStats();
+  renderPills();
+  renderList();
+}
+
+function renderStats() {
+  const enTaller = ordenes.filter(o => !["Listo","Entregado"].includes(o.estado)).length;
+  const listos = ordenes.filter(o => o.estado === "Listo").length;
+  const now = new Date();
+  const esteMes = ordenes.filter(o => {
+    const d = new Date(o.fechaIngreso);
+    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+  }).length;
+  document.getElementById("stats").innerHTML = `
+    <div class="stat"><b>${enTaller}</b><span>En taller</span></div>
+    <div class="stat"><b>${listos}</b><span>Listos p/entregar</span></div>
+    <div class="stat"><b>${esteMes}</b><span>Ingresados este mes</span></div>
+  `;
+}
+
+function renderPills() {
+  const counts = { Todos: ordenes.length };
+  ESTADOS.forEach(e => counts[e] = ordenes.filter(o => o.estado === e).length);
+  const opts = ["Todos", ...ESTADOS];
+  document.getElementById("pills").innerHTML = opts.map(e =>
+    `<div class="pill ${e === filtroEstado ? "active" : ""}" data-estado="${e}">${e} (${counts[e]})</div>`
+  ).join("");
+  document.querySelectorAll(".pill").forEach(p => p.onclick = () => { filtroEstado = p.dataset.estado; render(); });
+}
+
+function renderList() {
+  let items = [...ordenes];
+  if (filtroEstado !== "Todos") items = items.filter(o => o.estado === filtroEstado);
+  if (busqueda.trim()) {
+    const q = busqueda.toLowerCase();
+    items = items.filter(o => (o.cliente + " " + o.marca + " " + o.tipo).toLowerCase().includes(q));
+  }
+  items.sort((a,b) => new Date(b.fechaIngreso) - new Date(a.fechaIngreso));
+
+  const list = document.getElementById("list");
+  if (!items.length) {
+    list.innerHTML = `<div class="empty">Sin motores en esta vista. Toca "Nuevo ingreso" para registrar uno.</div>`;
+    return;
+  }
+  list.innerHTML = items.map(o => cardHtml(o)).join("");
+
+  items.forEach(o => {
+    const card = document.getElementById("card-" + o.id);
+    card.querySelector(".card-top").onclick = () => { openId = (openId === o.id ? null : o.id); render(); };
+    card.querySelector(".card-bottom").onclick = () => { openId = (openId === o.id ? null : o.id); render(); };
+    const sel = card.querySelector(".sel-estado");
+    if (sel) sel.onchange = () => updateEstado(o.id, sel.value);
+    const delBtn = card.querySelector(".btn-del");
+    if (delBtn) delBtn.onclick = () => borrar(o.id);
+    const editBtn = card.querySelector(".btn-edit");
+    if (editBtn) editBtn.onclick = () => abrirSheetEditar(o.id);
+    const pdfBtn = card.querySelector(".btn-pdf");
+    if (pdfBtn) pdfBtn.onclick = () => exportarPDF(o.id, pdfBtn);
+    card.querySelectorAll(".foto-view").forEach(img => {
+      img.onclick = (e) => { e.stopPropagation(); abrirLightbox(img.dataset.url); };
+    });
+  });
+}
+
+function abrirLightbox(url) {
+  document.getElementById("lightboxImg").src = url;
+  document.getElementById("lightbox").classList.add("open");
+}
+document.getElementById("lightbox").onclick = () => document.getElementById("lightbox").classList.remove("open");
+
+function cardHtml(o) {
+  const abierto = openId === o.id;
+  return `
+  <div class="card" id="card-${o.id}">
+    <div class="card-top">
+      <div>
+        <div class="ord mono">ORD-${ordenNumero(o.id)} · ${fmtFecha(o.fechaIngreso)}</div>
+        <div class="cliente">${escapeHtml(o.cliente || "Sin nombre")}</div>
+        <div class="motor-line">${escapeHtml(o.tipo)} · ${escapeHtml(o.potencia || "—")} · ${escapeHtml(o.voltaje || "—")} ${o.marca ? "· " + escapeHtml(o.marca) : ""}</div>
+        ${o.falla ? `<div class="falla">${escapeHtml(o.falla)}</div>` : ""}
+      </div>
+    </div>
+    <div class="card-bottom">
+      <span class="badge badge-${o.estado}">${o.estado}</span>
+      <span class="total">${fmtQ(o.total)}</span>
+    </div>
+    <div class="detail ${abierto ? "open" : ""}">
+      ${o.telefono ? `<div class="row2">📞 ${escapeHtml(o.telefono)}</div>` : ""}
+      <div class="row2">
+        <select class="sel-estado">${ESTADOS.map(e => `<option ${e===o.estado?"selected":""}>${e}</option>`).join("")}</select>
+      </div>
+      ${o.notas ? `<div class="row2" style="color:var(--text-dim); font-size:13px;">${escapeHtml(o.notas)}</div>` : ""}
+      <div class="row2" style="color:var(--text-dim); font-size:12.5px;">Materiales ${fmtQ(o.materiales)} · Mano de obra ${o.horas || 0}h</div>
+      ${(o.materialesItems && o.materialesItems.length) ? `<div style="margin-bottom:8px;">${o.materialesItems.map(it => `<div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-dim); padding:2px 0;"><span>${escapeHtml(it.nombre)} ×${it.cantidad}${it.unidad ? " " + escapeHtml(it.unidad) : ""}</span><span>${fmtQ(it.subtotal)}</span></div>`).join("")}</div>` : ""}
+      ${(o.fotos && o.fotos.length) ? `<div class="card-fotos">${o.fotos.map(f => `<img src="${f.url}" data-url="${f.url}" class="foto-view">`).join("")}</div>` : ""}
+      <div class="detail-actions">
+        <button class="btn-sm btn-edit">Editar</button>
+        <button class="btn-sm btn-pdf">Exportar PDF</button>
+        <button class="btn-sm danger btn-del">Eliminar</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function escapeHtml(s) {
+  return String(s || "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+
+async function updateEstado(id, nuevo) {
+  const idx = ordenes.findIndex(x => x.id === id);
+  if (idx === -1) return;
+  ordenes[idx] = { ...ordenes[idx], estado: nuevo };
+  render();
+  if (db) {
+    try { await db.doc("ordenes/" + id).update({ estado: nuevo }); }
+    catch (e) { alert("No se pudo guardar el estado en el servidor: " + (e && e.code ? e.code : e)); }
+  }
+}
+
+async function borrar(id) {
+  ordenes = ordenes.filter(o => o.id !== id);
+  if (db) { try { await db.doc("ordenes/" + id).delete(); } catch(e) {} }
+  render();
+}
+
+function renderFotosRow() {
+  const row = document.getElementById("fotosRow");
+  const addBtn = `<button type="button" class="foto-add" id="fotoAddBtn" title="Tomar foto">📷</button><button type="button" class="foto-add" id="archivoAddBtn" title="Elegir archivo">📁</button>`;
+  row.innerHTML = fotosActuales.map((f, i) => `
+    <div class="foto-thumb"><img src="${f.url}"><button type="button" class="rm" data-i="${i}">✕</button></div>
+  `).join("") + addBtn;
+  row.querySelectorAll(".rm").forEach(btn => {
+    btn.onclick = () => { fotosActuales.splice(Number(btn.dataset.i), 1); renderFotosRow(); };
+  });
+  document.getElementById("fotoAddBtn").onclick = () => document.getElementById("f-foto-input").click();
+  document.getElementById("archivoAddBtn").onclick = () => document.getElementById("f-archivo-input").click();
+}
+
+function fileADataUrl(file, maxDim, quality) {
+  maxDim = maxDim || 1100; quality = quality || 0.72;
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        let w = img.width, h = img.height;
+        if (w > maxDim || h > maxDim) {
+          const s = maxDim / Math.max(w, h);
+          w = Math.round(w * s); h = Math.round(h * s);
+        }
+        const canvas = document.createElement("canvas");
+        canvas.width = w; canvas.height = h;
+        canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+        try { resolve(canvas.toDataURL("image/jpeg", quality)); } catch (e) { reject(e); }
+      };
+      img.onerror = reject;
+      img.src = reader.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function subirFotos(e) {
+  const files = Array.from(e.target.files || []);
+  if (!files.length) return;
+  document.querySelectorAll(".foto-add").forEach(b => b.classList.add("busy"));
+  for (const file of files) {
+    try {
+      const dataUrl = await fileADataUrl(file);
+      fotosActuales.push({ id: "f" + Date.now() + Math.random().toString(36).slice(2, 6), url: dataUrl });
+    } catch (err) {
+      alert("No se pudo procesar una foto. Intenta de nuevo.");
+    }
+  }
+  renderFotosRow();
+}
+
+function renderCatSelect() {
+  const sel = document.getElementById("matSelect");
+  if (!sel) return;
+  const actual = sel.value;
+  sel.innerHTML = '<option value="">Selecciona un material…</option>' +
+    catalogo.map(m => `<option value="${m.id}">${escapeHtml(m.nombre)} (${fmtQ(m.precio)}/${escapeHtml(m.unidad || "u")})</option>`).join("");
+  sel.value = actual;
+}
+
+function renderCatList() {
+  const el = document.getElementById("catList");
+  if (!el) return;
+  if (!catalogo.length) {
+    el.innerHTML = '<div class="empty" style="padding:16px 0;">Aún no hay materiales. Agrega el primero arriba.</div>';
+    return;
+  }
+  el.innerHTML = catalogo.map(m => `
+    <div class="cat-row" data-id="${m.id}">
+      <div><strong>${escapeHtml(m.nombre)}</strong><div style="color:var(--text-dim); font-size:12.5px;">${fmtQ(m.precio)} / ${escapeHtml(m.unidad || "unidad")}</div></div>
+      <div style="display:flex; gap:6px;">
+        <button type="button" class="btn-sm cat-edit">Editar</button>
+        <button type="button" class="btn-sm danger cat-del">Eliminar</button>
+      </div>
+    </div>
+  `).join("");
+  el.querySelectorAll(".cat-edit").forEach(btn => {
+    btn.onclick = () => {
+      const id = btn.closest(".cat-row").dataset.id;
+      const m = catalogo.find(x => x.id === id);
+      if (!m) return;
+      catEditId = id;
+      document.getElementById("cat-nombre").value = m.nombre;
+      document.getElementById("cat-unidad").value = m.unidad || "";
+      document.getElementById("cat-precio").value = m.precio;
+      document.getElementById("btnCatSave").textContent = "Guardar cambios";
+    };
+  });
+  el.querySelectorAll(".cat-del").forEach(btn => {
+    btn.onclick = async () => {
+      const id = btn.closest(".cat-row").dataset.id;
+      catalogo = catalogo.filter(x => x.id !== id);
+      renderCatList(); renderCatSelect();
+      if (db) { try { await db.doc("materiales/" + id).delete(); } catch (e) {} }
+    };
+  });
+}
+
+function limpiarFormCatalogo() {
+  catEditId = null;
+  document.getElementById("cat-nombre").value = "";
+  document.getElementById("cat-unidad").value = "";
+  document.getElementById("cat-precio").value = "";
+  document.getElementById("btnCatSave").textContent = "Agregar material";
+}
+
+function abrirCatalogo() {
+  limpiarFormCatalogo();
+  renderCatList();
+  document.getElementById("catOverlay").classList.add("open");
+}
+function cerrarCatalogo() { document.getElementById("catOverlay").classList.remove("open"); }
+
+async function guardarMaterialCatalogo() {
+  const nombre = document.getElementById("cat-nombre").value.trim();
+  if (!nombre) { document.getElementById("cat-nombre").focus(); return; }
+  const precio = Number(document.getElementById("cat-precio").value) || 0;
+  const unidad = document.getElementById("cat-unidad").value.trim() || "unidad";
+  if (catEditId) {
+    const idx = catalogo.findIndex(x => x.id === catEditId);
+    if (idx > -1) catalogo[idx] = { ...catalogo[idx], nombre, precio, unidad };
+    if (db) {
+      try { await db.doc("materiales/" + catEditId).update({ nombre, precio, unidad }); }
+      catch (e) { alert("No se pudo guardar el material en el servidor: " + (e && e.code ? e.code : e)); }
+    }
+  } else {
+    const id = "mat" + Date.now();
+    catalogo.push({ id, nombre, precio, unidad });
+    if (db) {
+      try { await db.doc("materiales/" + id).set({ id, nombre, precio, unidad }); }
+      catch (e) { alert("No se pudo guardar el material en el servidor: " + (e && e.code ? e.code : e)); }
+    }
+  }
+  limpiarFormCatalogo();
+  renderCatList(); renderCatSelect();
+}
+
+function renderItemsMateriales() {
+  const el = document.getElementById("itemsMateriales");
+  if (!el) return;
+  if (!itemsActuales.length) {
+    el.innerHTML = '<div style="color:var(--text-dim); font-size:12.5px;">Aún no has agregado materiales a este motor.</div>';
+  } else {
+    el.innerHTML = itemsActuales.map((it, i) => `
+      <div class="mat-row">
+        <span class="mline">${escapeHtml(it.nombre)} · ${it.cantidad} ${escapeHtml(it.unidad || "")} × ${fmtQ(it.precio)}</span>
+        <span class="mright"><strong>${fmtQ(it.subtotal)}</strong><button type="button" class="chip-rm" data-i="${i}">✕</button></span>
+      </div>
+    `).join("");
+    el.querySelectorAll(".chip-rm").forEach(btn => {
+      btn.onclick = () => { itemsActuales.splice(Number(btn.dataset.i), 1); renderItemsMateriales(); };
+    });
+  }
+  document.getElementById("matTotalLabel").textContent = fmtQ(materialesTotal());
+}
+
+function materialesTotal() {
+  return itemsActuales.reduce((s, it) => s + it.subtotal, 0);
+}
+
+function agregarItemMaterial() {
+  const sel = document.getElementById("matSelect");
+  const matId = sel.value;
+  const cantidad = Number(document.getElementById("matCantidad").value) || 0;
+  if (!matId || cantidad <= 0) return;
+  const m = catalogo.find(x => x.id === matId);
+  if (!m) return;
+  itemsActuales.push({
+    id: "it" + Date.now(), materialId: m.id, nombre: m.nombre, unidad: m.unidad,
+    precio: m.precio, cantidad, subtotal: Math.round(m.precio * cantidad * 100) / 100
+  });
+  sel.value = "";
+  document.getElementById("matCantidad").value = "";
+  renderItemsMateriales();
+}
+
+function abrirSheet() {
+  editId = null;
+  fotosActuales = [];
+  itemsActuales = [];
+  document.getElementById("sheetTitle").textContent = "Nuevo ingreso";
+  ["cliente","telefono","potencia","voltaje","marca","falla","horas","total","notas"].forEach(k => {
+    const el = document.getElementById("f-" + k);
+    if (el) el.value = "";
+  });
+  document.getElementById("f-tipo").value = "Monofásico";
+  renderFotosRow();
+  renderCatSelect();
+  renderItemsMateriales();
+  document.getElementById("overlay").classList.add("open");
+}
+
+function abrirSheetEditar(id) {
+  const o = ordenes.find(x => x.id === id);
+  if (!o) return;
+  editId = id;
+  fotosActuales = [...(o.fotos || [])];
+  itemsActuales = [...(o.materialesItems || [])];
+  document.getElementById("sheetTitle").textContent = "Editar ORD-" + ordenNumero(id);
+  document.getElementById("f-cliente").value = o.cliente || "";
+  document.getElementById("f-telefono").value = o.telefono || "";
+  document.getElementById("f-tipo").value = o.tipo || "Monofásico";
+  document.getElementById("f-potencia").value = o.potencia || "";
+  document.getElementById("f-voltaje").value = o.voltaje || "";
+  document.getElementById("f-marca").value = o.marca || "";
+  document.getElementById("f-falla").value = o.falla || "";
+  document.getElementById("f-horas").value = o.horas || "";
+  document.getElementById("f-total").value = o.total || "";
+  document.getElementById("f-notas").value = o.notas || "";
+  renderFotosRow();
+  renderCatSelect();
+  renderItemsMateriales();
+  document.getElementById("overlay").classList.add("open");
+}
+
+function cerrarSheet() { document.getElementById("overlay").classList.remove("open"); }
+
+async function guardar() {
+  try {
+    const cliente = document.getElementById("f-cliente").value.trim();
+    if (!cliente) {
+      alert("Ingresa el nombre del cliente antes de guardar.");
+      document.getElementById("f-cliente").focus();
+      return;
+    }
+    const datos = {
+      cliente,
+      telefono: document.getElementById("f-telefono").value.trim(),
+      tipo: document.getElementById("f-tipo").value,
+      potencia: document.getElementById("f-potencia").value.trim(),
+      voltaje: document.getElementById("f-voltaje").value.trim(),
+      marca: document.getElementById("f-marca").value.trim(),
+      falla: document.getElementById("f-falla").value.trim(),
+      materiales: materialesTotal(),
+      materialesItems: itemsActuales,
+      horas: Number(document.getElementById("f-horas").value) || 0,
+      total: Number(document.getElementById("f-total").value) || 0,
+      notas: document.getElementById("f-notas").value.trim(),
+      fotos: fotosActuales
+    };
+
+    if (editId) {
+      const idx = ordenes.findIndex(x => x.id === editId);
+      if (idx > -1) ordenes[idx] = { ...ordenes[idx], ...datos };
+      cerrarSheet();
+      render();
+      if (db) {
+        try { await db.doc("ordenes/" + editId).update(datos); }
+        catch (e) { alert("No se pudo guardar en el servidor (se quedó solo en este dispositivo): " + (e && e.code ? e.code : e)); }
+      }
+    } else {
+      const id = "m" + Date.now();
+      const nueva = { id, ...datos, estado: "Recibido", fechaIngreso: new Date().toISOString() };
+      ordenes.push(nueva);
+      cerrarSheet();
+      render();
+      if (db) {
+        try { await db.doc("ordenes/" + id).set(nueva); }
+        catch (e) { alert("No se pudo guardar en el servidor (se quedó solo en este dispositivo): " + (e && e.code ? e.code : e)); }
+      }
+    }
+  } catch (err) {
+    alert("Ocurrió un error al guardar: " + (err && err.message ? err.message : err));
+  }
+}
+
+function getImgSize(dataUrl) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => resolve({ w: img.naturalWidth || 1, h: img.naturalHeight || 1 });
+    img.onerror = () => resolve({ w: 1, h: 1 });
+    img.src = dataUrl;
+  });
+}
+
+async function exportarPDF(id, btn) {
+  const o = ordenes.find(x => x.id === id);
+  if (!o || !window.jspdf) return;
+  if (btn) btn.classList.add("busy");
+  try {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    let y = 20;
+    doc.setFont("helvetica", "bold"); doc.setFontSize(16);
+    doc.text("Orden de trabajo — Taller de Rebobinado", 14, y); y += 8;
+    doc.setFontSize(11); doc.setFont("helvetica", "normal");
+    doc.text("ORD-" + ordenNumero(o.id) + "   ·   Ingreso: " + fmtFecha(o.fechaIngreso) + "   ·   Estado: " + o.estado, 14, y); y += 10;
+    doc.setDrawColor(180); doc.line(14, y, 196, y); y += 8;
+
+    const campo = (label, valor) => {
+      doc.setFont("helvetica", "bold"); doc.text(label, 14, y);
+      doc.setFont("helvetica", "normal"); doc.text(String(valor || "—"), 60, y);
+      y += 8;
+    };
+    campo("Cliente:", o.cliente);
+    campo("Teléfono:", o.telefono);
+    campo("Tipo de motor:", o.tipo);
+    campo("Potencia:", o.potencia);
+    campo("Voltaje:", o.voltaje);
+    campo("Marca:", o.marca);
+    y += 2; doc.line(14, y, 196, y); y += 8;
+    doc.setFont("helvetica", "bold"); doc.text("Falla reportada:", 14, y); y += 7;
+    doc.setFont("helvetica", "normal");
+    doc.text(doc.splitTextToSize(o.falla || "—", 180), 14, y); y += 16;
+    if (o.materialesItems && o.materialesItems.length) {
+      doc.setFont("helvetica", "bold"); doc.text("Materiales utilizados:", 14, y); y += 7;
+      doc.setFont("helvetica", "normal"); doc.setFontSize(10);
+      o.materialesItems.forEach(it => {
+        if (y > 275) { doc.addPage(); y = 20; }
+        doc.text(`${it.nombre} — ${it.cantidad} ${it.unidad || ""} × ${fmtQ(it.precio)}`, 16, y);
+        doc.text(fmtQ(it.subtotal), 190, y, { align: "right" });
+        y += 6;
+      });
+      doc.setFontSize(11); y += 3;
+    }
+    campo("Total materiales:", fmtQ(o.materiales));
+    campo("Mano de obra:", (o.horas || 0) + " horas");
+    doc.setFont("helvetica", "bold"); doc.text("Total presupuesto:", 14, y);
+    doc.text(fmtQ(o.total), 60, y); y += 8;
+    if (o.notas) { doc.setFont("helvetica", "normal"); doc.text(doc.splitTextToSize("Notas: " + o.notas, 180), 14, y); y += 10; }
+
+    if (o.fotos && o.fotos.length) {
+      y += 4;
+      if (y > 250) { doc.addPage(); y = 20; }
+      doc.setFont("helvetica", "bold"); doc.text("Fotos adjuntas:", 14, y); y += 8;
+      const maxW = 100, maxH = 90;
+      for (const foto of o.fotos) {
+        const dim = await getImgSize(foto.url);
+        let w = maxW, h = maxW * dim.h / dim.w;
+        if (h > maxH) { h = maxH; w = maxH * dim.w / dim.h; }
+        if (y + h > 280) { doc.addPage(); y = 20; }
+        try { doc.addImage(foto.url, "JPEG", 14, y, w, h); } catch (e) {}
+        y += h + 6;
+      }
+    }
+
+    const filename = "ORD-" + ordenNumero(o.id) + "-" + (o.cliente || "motor").replace(/[^a-z0-9]+/gi, "_") + ".pdf";
+    const blob = doc.output("blob");
+
+    if (downloadsCap) {
+      try {
+        await downloadsCap.save({ filename, data: blob });
+      } catch (err) {
+        if (err && err.code !== "declined") alert("No se pudo guardar el PDF (" + (err.code || "error") + ").");
+      }
+    } else {
+      doc.save(filename);
+    }
+  } finally {
+    if (btn) btn.classList.remove("busy");
+  }
+}
+
+function on(id, evento, fn) {
+  const el = document.getElementById(id);
+  if (el) el[evento] = fn;
+}
+
+on("btnNew", "onclick", abrirSheet);
+on("f-foto-input", "onchange", subirFotos);
+on("f-archivo-input", "onchange", subirFotos);
+on("btnCancel", "onclick", cerrarSheet);
+on("overlay", "onclick", (e) => { if (e.target.id === "overlay") cerrarSheet(); });
+on("btnSave", "onclick", guardar);
+on("search", "oninput", (e) => { busqueda = e.target.value; render(); });
+on("btnCatalogo", "onclick", abrirCatalogo);
+on("btnCatClose", "onclick", cerrarCatalogo);
+on("catOverlay", "onclick", (e) => { if (e.target.id === "catOverlay") cerrarCatalogo(); });
+on("btnCatSave", "onclick", guardarMaterialCatalogo);
+on("btnAddMat", "onclick", agregarItemMaterial);
+on("btnUsarMatTotal", "onclick", () => { document.getElementById("f-total").value = materialesTotal(); });
+
+render();
+
+(async function initDb() {
+  try {
+    db = await claude.use("db");
+    if (!db) return;
+    db.collection("ordenes").onSnapshot((snap) => {
+      ordenes = snap.docs.map(d => d.data());
+      render();
+    });
+    db.collection("materiales").onSnapshot((snap) => {
+      catalogo = snap.docs.map(d => d.data());
+      renderCatSelect();
+      if (document.getElementById("catOverlay").classList.contains("open")) renderCatList();
+    });
+  } catch (e) {}
+})();
+
+(async function initDownloads() {
+  try { downloadsCap = await claude.use("downloads"); } catch (e) {}
+})();
+</script>
+  <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js')
+      .then(() => console.log('Service Worker Registrado Exitosamente'))
+      .catch((err) => console.log('Error al registrar el Service Worker', err));
+  }
+</script>
+
+</body>
+</html>
