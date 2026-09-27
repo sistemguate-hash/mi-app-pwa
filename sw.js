@@ -1,9 +1,10 @@
-const CACHE_NAME = "rebobinado-v3";
+const CACHE_NAME = "rebobinado-v4";
 
 const APP_SHELL = [
   "./",
   "./index.html",
-  "./manifest.json"
+  "./manifest.json",
+  "./icons/icon-512.png"
 ];
 
 // INSTALACIÓN
