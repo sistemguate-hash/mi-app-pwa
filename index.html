@@ -785,20 +785,183 @@ on("btnUsarMatTotal", "onclick", () => { document.getElementById("f-total").valu
 
 render();
 
+// BASE DE DATOS LOCAL - IndexedDB
 (async function initDb() {
   try {
-    db = await claude.use("db");
-    if (!db) return;
+    const DB_NAME = "taller-rebobinado";
+    const DB_VERSION = 1;
+
+    function abrirBaseLocal() {
+      return new Promise((resolve, reject) => {
+        const request = indexedDB.open(DB_NAME, DB_VERSION);
+
+        request.onupgradeneeded = () => {
+          const database = request.result;
+
+          if (!database.objectStoreNames.contains("ordenes")) {
+            database.createObjectStore("ordenes", { keyPath: "id" });
+          }
+
+          if (!database.objectStoreNames.contains("materiales")) {
+            database.createObjectStore("materiales", { keyPath: "id" });
+          }
+        };
+
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+    }
+
+    function obtenerTodos(database, storeName) {
+      return new Promise((resolve, reject) => {
+        const transaction = database.transaction(storeName, "readonly");
+        const store = transaction.objectStore(storeName);
+        const request = store.getAll();
+
+        request.onsuccess = () => resolve(request.result || []);
+        request.onerror = () => reject(request.error);
+      });
+    }
+
+    function obtenerUno(database, storeName, id) {
+      return new Promise((resolve, reject) => {
+        const transaction = database.transaction(storeName, "readonly");
+        const store = transaction.objectStore(storeName);
+        const request = store.get(id);
+
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+    }
+
+    function guardarUno(database, storeName, data) {
+      return new Promise((resolve, reject) => {
+        const transaction = database.transaction(storeName, "readwrite");
+        const store = transaction.objectStore(storeName);
+        const request = store.put(data);
+
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(request.error);
+      });
+    }
+
+    function eliminarUno(database, storeName, id) {
+      return new Promise((resolve, reject) => {
+        const transaction = database.transaction(storeName, "readwrite");
+        const store = transaction.objectStore(storeName);
+        const request = store.delete(id);
+
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(request.error);
+      });
+    }
+
+    const database = await abrirBaseLocal();
+
+    const listeners = {
+      ordenes: [],
+      materiales: []
+    };
+
+    async function emitir(storeName) {
+      const datos = await obtenerTodos(database, storeName);
+
+      const snapshot = {
+        docs: datos.map(item => ({
+          data: () => item
+        }))
+      };
+
+      listeners[storeName].forEach(callback => {
+        try {
+          callback(snapshot);
+        } catch (error) {
+          console.error("Error actualizando vista:", error);
+        }
+      });
+    }
+
+    db = {
+      collection(storeName) {
+        return {
+          onSnapshot(callback) {
+            if (!listeners[storeName]) {
+              listeners[storeName] = [];
+            }
+
+            listeners[storeName].push(callback);
+
+            emitir(storeName);
+
+            return () => {
+              listeners[storeName] =
+                listeners[storeName].filter(fn => fn !== callback);
+            };
+          }
+        };
+      },
+
+      doc(path) {
+        const partes = path.split("/");
+        const storeName = partes[0];
+        const id = partes[1];
+
+        return {
+          async set(data) {
+            await guardarUno(database, storeName, data);
+            await emitir(storeName);
+          },
+
+          async update(cambios) {
+            const actual = await obtenerUno(database, storeName, id);
+
+            if (!actual) {
+              throw new Error("Registro no encontrado");
+            }
+
+            const actualizado = {
+              ...actual,
+              ...cambios
+            };
+
+            await guardarUno(database, storeName, actualizado);
+            await emitir(storeName);
+          },
+
+          async delete() {
+            await eliminarUno(database, storeName, id);
+            await emitir(storeName);
+          }
+        };
+      }
+    };
+
+    console.log("Base de datos local iniciada correctamente");
+
     db.collection("ordenes").onSnapshot((snap) => {
       ordenes = snap.docs.map(d => d.data());
       render();
     });
+
     db.collection("materiales").onSnapshot((snap) => {
       catalogo = snap.docs.map(d => d.data());
+
       renderCatSelect();
-      if (document.getElementById("catOverlay").classList.contains("open")) renderCatList();
+
+      if (
+        document
+          .getElementById("catOverlay")
+          .classList
+          .contains("open")
+      ) {
+        renderCatList();
+      }
     });
-  } catch (e) {}
+
+  } catch (error) {
+    console.error("Error iniciando IndexedDB:", error);
+    alert("No se pudo iniciar el almacenamiento local.");
+  }
 })();
 
 (async function initDownloads() {
