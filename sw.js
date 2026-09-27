@@ -1,29 +1,18 @@
-const CACHE_NAME = 'miapp-cache-v1';
-const ASSETS = [
-  './',
-  './index.html',
-  './manifest.json'
-];
+const CACHE_NAME = 'rebobinado-v1';
 
-// Instalar el Service Worker y guardar archivos en caché
+// Forzar la activación inmediata
 self.addEventListener('install', (e) => {
-  e.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS);
-    })
-  );
+  self.skipWaiting();
 });
 
-// Activar el Service Worker
 self.addEventListener('activate', (e) => {
   e.waitUntil(self.clients.claim());
 });
 
-// Responder desde la caché cuando no haya internet
+// Responder de manera fluida
 self.addEventListener('fetch', (e) => {
   e.respondWith(
-    caches.match(e.request).then((res) => {
-      return res || fetch(e.request);
-    })
+    fetch(e.request).catch(() => caches.match(e.request))
   );
 });
+
