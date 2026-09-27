@@ -1,18 +1,84 @@
-const CACHE_NAME = 'rebobinado-v1';
+const CACHE_NAME = "rebobinado-v2";
 
-// Forzar la activación inmediata
-self.addEventListener('install', (e) => {
-  self.skipWaiting();
-});
+const APP_SHELL = [
+  "./",
+  "./index.html",
+  "./manifest.json"
+];
 
-self.addEventListener('activate', (e) => {
-  e.waitUntil(self.clients.claim());
-});
-
-// Responder de manera fluida
-self.addEventListener('fetch', (e) => {
-  e.respondWith(
-    fetch(e.request).catch(() => caches.match(e.request))
+// INSTALACIÓN
+self.addEventListener("install", (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then((cache) => cache.addAll(APP_SHELL))
+      .then(() => self.skipWaiting())
   );
 });
 
+// ACTIVACIÓN
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    caches.keys()
+      .then((cacheNames) => {
+        return Promise.all(
+          cacheNames
+            .filter((cacheName) => cacheName !== CACHE_NAME)
+            .map((cacheName) => caches.delete(cacheName))
+        );
+      })
+      .then(() => self.clients.claim())
+  );
+});
+
+// PETICIONES
+self.addEventListener("fetch", (event) => {
+  if (event.request.method !== "GET") {
+    return;
+  }
+
+  const requestURL = new URL(event.request.url);
+
+  // Solo manejamos recursos de nuestra propia aplicación
+  if (requestURL.origin !== self.location.origin) {
+    return;
+  }
+
+  event.respondWith(
+    caches.match(event.request)
+      .then((cachedResponse) => {
+        if (cachedResponse) {
+          return cachedResponse;
+        }
+
+        return fetch(event.request)
+          .then((networkResponse) => {
+            if (
+              networkResponse &&
+              networkResponse.status === 200 &&
+              networkResponse.type === "basic"
+            ) {
+              const responseToCache = networkResponse.clone();
+
+              caches.open(CACHE_NAME)
+                .then((cache) => {
+                  cache.put(event.request, responseToCache);
+                });
+            }
+
+            return networkResponse;
+          })
+          .catch(() => {
+            // Si estamos sin conexión y es una navegación,
+            // mostramos la aplicación almacenada.
+            if (event.request.mode === "navigate") {
+              return caches.match("./index.html");
+            }
+
+            return new Response("", {
+              status: 503,
+              statusText: "Sin conexión"
+            });
+          });
+      })
+  );
+});
