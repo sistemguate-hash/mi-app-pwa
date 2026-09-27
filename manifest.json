@@ -1,11 +1,19 @@
 {
-    "name": "Taller de Rebobinado",
-      "short_name": "Rebobinado",
-        "description": "Gestión de órdenes, motores, materiales y trabajos de rebobinado",
-          "start_url": "./",
-            "scope": "./",
-              "display": "standalone",
-                "orientation": "portrait-primary",
-                  "background_color": "#F3F1EC",
-                    "theme_color": "#B5622E"
-                    }
+  "name": "Taller de Rebobinado",
+  "short_name": "Rebobinado",
+  "description": "Gestión de órdenes, motores, materiales y trabajos de rebobinado",
+  "start_url": "./",
+  "scope": "./",
+  "id": "/mi-app-pwa/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#F3F1EC",
+  "theme_color": "#B5622E",
+  "icons": [
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
