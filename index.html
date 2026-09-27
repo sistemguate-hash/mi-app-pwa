@@ -592,7 +592,11 @@ function renderItemsMateriales() {
 function materialesTotal() {
   return itemsActuales.reduce((s, it) => s + it.subtotal, 0);
 }
-
+function manoObraTotal() {
+  const horas = Number(document.getElementById("f-horas").value) || 0;
+  const tarifa = Number(document.getElementById("f-tarifa").value) || 0;
+  return Math.round(horas * tarifa * 100) / 100;
+}
 function agregarItemMaterial() {
   const sel = document.getElementById("matSelect");
   const matId = sel.value;
