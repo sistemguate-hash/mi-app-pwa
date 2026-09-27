@@ -557,13 +557,32 @@ function renderItemsMateriales() {
   } else {
     el.innerHTML = itemsActuales.map((it, i) => `
       <div class="mat-row">
-        <span class="mline">${escapeHtml(it.nombre)} · ${it.cantidad} ${escapeHtml(it.unidad || "")} × ${fmtQ(it.precio)}</span>
+        <span class="mline">
+  ${escapeHtml(it.nombre)} ·
+  <input type="number" class="mat-cantidad" data-i="${i}" value="${it.cantidad}" min="0.01" step="0.01">
+  ${escapeHtml(it.unidad || "")} × ${fmtQ(it.precio)}
+</span>
         <span class="mright"><strong>${fmtQ(it.subtotal)}</strong><button type="button" class="chip-rm" data-i="${i}">✕</button></span>
       </div>
     `).join("");
     el.querySelectorAll(".chip-rm").forEach(btn => {
       btn.onclick = () => { itemsActuales.splice(Number(btn.dataset.i), 1); renderItemsMateriales(); };
     });
+    el.querySelectorAll(".mat-cantidad").forEach(input => {
+  input.onchange = () => {
+    const i = Number(input.dataset.i);
+    const cantidad = Number(input.value);
+
+    if (!cantidad || cantidad <= 0) {
+      input.value = itemsActuales[i].cantidad;
+      return;
+    }
+
+    itemsActuales[i].cantidad = cantidad;
+    itemsActuales[i].subtotal = cantidad * itemsActuales[i].precio;
+    renderItemsMateriales();
+  };
+});
   }
   document.getElementById("matTotalLabel").textContent = fmtQ(materialesTotal());
 }
