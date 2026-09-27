@@ -404,6 +404,7 @@ async function updateEstado(id, nuevo) {
 }
 
 async function borrar(id) {
+  if (!confirm("¿Estás seguro de que deseas eliminar esta orden?")) return;
   ordenes = ordenes.filter(o => o.id !== id);
   if (db) { try { await db.doc("ordenes/" + id).delete(); } catch(e) {} }
   render();
