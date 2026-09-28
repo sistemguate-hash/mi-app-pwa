@@ -605,6 +605,15 @@ function actualizarManoObra() {
   const el = document.getElementById("manoObraLabel");
   if (el) el.textContent = fmtQ(manoObraTotal());
 }
+function actualizarTotalPresupuesto() {
+  const materiales = materialesTotal();
+  const manoObra = manoObraTotal();
+  const margen = Number(document.getElementById("f-margen").value) || 0;
+
+  const total = Math.round((materiales + manoObra + margen) * 100) / 100;
+
+  document.getElementById("f-total").value = total;
+}
 function agregarItemMaterial() {
   const sel = document.getElementById("matSelect");
   const matId = sel.value;
