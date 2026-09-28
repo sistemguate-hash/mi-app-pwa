@@ -816,7 +816,6 @@ on("btnNew", "onclick", abrirSheet);
 on("f-foto-input", "onchange", subirFotos);
 on("f-archivo-input", "onchange", subirFotos);
 on("btnCancel", "onclick", cerrarSheet);
-on("overlay", "onclick", (e) => { if (e.target.id === "overlay") cerrarSheet(); });
 on("btnSave", "onclick", guardar);
 on("search", "oninput", (e) => { busqueda = e.target.value; render(); });
 on("btnCatalogo", "onclick", abrirCatalogo);
