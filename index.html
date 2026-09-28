@@ -654,6 +654,27 @@ async function guardarCliente() {
 
   renderClientesList();
 }
+function renderClientesList() {
+  const el = document.getElementById("clientesList");
+  if (!el) return;
+
+  if (!clientes.length) {
+    el.innerHTML = '<div class="empty" style="padding:16px 0;">Aún no hay clientes registrados.</div>';
+    return;
+  }
+
+  el.innerHTML = clientes.map(c => `
+    <div class="cat-row">
+      <div>
+        <strong>${escapeHtml(c.nombre)}</strong>
+        <div style="color:var(--text-dim); font-size:12.5px;">
+          ${c.nit ? "NIT: " + escapeHtml(c.nit) : "Sin NIT"}
+          ${c.telefono ? " · Tel: " + escapeHtml(c.telefono) : ""}
+        </div>
+      </div>
+    </div>
+  `).join("");
+}
 function renderItemsMateriales() {
   const el = document.getElementById("itemsMateriales");
   if (!el) return;
