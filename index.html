@@ -812,21 +812,76 @@ doc.text("Total presupuesto:", 14, y);
 doc.text(fmtQ(o.total), 60, y);
 y += 8;
     if (o.notas) { doc.setFont("helvetica", "normal"); doc.text(doc.splitTextToSize("Notas: " + o.notas, 180), 14, y); y += 10; }
+if (o.fotos && o.fotos.length) {
+  y += 4;
 
-    if (o.fotos && o.fotos.length) {
-      y += 4;
-      if (y > 250) { doc.addPage(); y = 20; }
-      doc.setFont("helvetica", "bold"); doc.text("Fotos adjuntas:", 14, y); y += 8;
-      const maxW = 100, maxH = 90;
-      for (const foto of o.fotos) {
-        const dim = await getImgSize(foto.url);
-        let w = maxW, h = maxW * dim.h / dim.w;
-        if (h > maxH) { h = maxH; w = maxH * dim.w / dim.h; }
-        if (y + h > 280) { doc.addPage(); y = 20; }
-        try { doc.addImage(foto.url, "JPEG", 14, y, w, h); } catch (e) {}
-        y += h + 6;
+  if (y > 250) {
+    doc.addPage();
+    y = 20;
+  }
+
+  doc.setFont("helvetica", "bold");
+  doc.text("Fotos adjuntas:", 14, y);
+  y += 8;
+
+  const maxW = 82;
+  const maxH = 65;
+  const gapX = 10;
+  const gapY = 8;
+  const x1 = 14;
+  const x2 = x1 + maxW + gapX;
+
+  for (let i = 0; i < o.fotos.length; i += 2) {
+
+    const fila = [];
+
+    for (let j = 0; j < 2 && i + j < o.fotos.length; j++) {
+      const foto = o.fotos[i + j];
+      const dim = await getImgSize(foto.url);
+
+      let w = maxW;
+      let h = maxW * dim.h / dim.w;
+
+      if (h > maxH) {
+        h = maxH;
+        w = maxH * dim.w / dim.h;
       }
+
+      fila.push({
+        foto,
+        w,
+        h,
+        x: j === 0 ? x1 : x2
+      });
     }
+
+    const altoFila = Math.max(...fila.map(item => item.h));
+
+    if (y + altoFila > 280) {
+      doc.addPage();
+      y = 20;
+
+      doc.setFont("helvetica", "bold");
+      doc.text("Fotos adjuntas:", 14, y);
+      y += 8;
+    }
+
+    for (const item of fila) {
+      try {
+        doc.addImage(
+          item.foto.url,
+          "JPEG",
+          item.x,
+          y,
+          item.w,
+          item.h
+        );
+      } catch (e) {}
+    }
+
+    y += altoFila + gapY;
+  }
+}
 
     const filename = "ORD-" + ordenNumero(o.id) + "-" + (o.cliente || "motor").replace(/[^a-z0-9]+/gi, "_") + ".pdf";
     const blob = doc.output("blob");
