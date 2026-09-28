@@ -934,7 +934,7 @@ render();
 (async function initDb() {
   try {
     const DB_NAME = "taller-rebobinado";
-    const DB_VERSION = 1;
+    const DB_VERSION = 2;
 
     function abrirBaseLocal() {
       return new Promise((resolve, reject) => {
@@ -950,6 +950,9 @@ render();
           if (!database.objectStoreNames.contains("materiales")) {
             database.createObjectStore("materiales", { keyPath: "id" });
           }
+          if (!database.objectStoreNames.contains("clientes")) {
+  database.createObjectStore("clientes", { keyPath: "id" });
+}
         };
 
         request.onsuccess = () => resolve(request.result);
