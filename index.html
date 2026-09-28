@@ -1020,9 +1020,10 @@ render();
     const database = await abrirBaseLocal();
 
     const listeners = {
-      ordenes: [],
-      materiales: []
-    };
+  ordenes: [],
+  materiales: [],
+  clientes: []
+};
 
     async function emitir(storeName) {
       const datos = await obtenerTodos(database, storeName);
