@@ -1017,6 +1017,9 @@ on("btnCatClose", "onclick", cerrarCatalogo);
 on("catOverlay", "onclick", (e) => { if (e.target.id === "catOverlay") cerrarCatalogo(); });
 on("btnCatSave", "onclick", guardarMaterialCatalogo);
 on("btnCliSave", "onclick", guardarCliente);
+on("btnCliClose", "onclick", () => {
+  document.getElementById("clientesOverlay").classList.remove("open");
+});
 on("btnAddMat", "onclick", agregarItemMaterial);
 on("f-horas", "oninput", () => {
   actualizarManoObra();
