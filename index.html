@@ -824,8 +824,17 @@ on("btnCatClose", "onclick", cerrarCatalogo);
 on("catOverlay", "onclick", (e) => { if (e.target.id === "catOverlay") cerrarCatalogo(); });
 on("btnCatSave", "onclick", guardarMaterialCatalogo);
 on("btnAddMat", "onclick", agregarItemMaterial);
-on("f-horas", "oninput", actualizarManoObra);
-on("f-tarifa", "oninput", actualizarManoObra);
+on("f-horas", "oninput", () => {
+  actualizarManoObra();
+  actualizarTotalPresupuesto();
+});
+
+on("f-tarifa", "oninput", () => {
+  actualizarManoObra();
+  actualizarTotalPresupuesto();
+});
+
+on("f-margen", "oninput", actualizarTotalPresupuesto);
 on("btnUsarMatTotal", "onclick", () => { document.getElementById("f-total").value = materialesTotal(); });
 
 render();
