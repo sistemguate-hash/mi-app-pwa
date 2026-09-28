@@ -597,6 +597,10 @@ function manoObraTotal() {
   const tarifa = Number(document.getElementById("f-tarifa").value) || 0;
   return Math.round(horas * tarifa * 100) / 100;
 }
+function actualizarManoObra() {
+  const el = document.getElementById("manoObraLabel");
+  if (el) el.textContent = fmtQ(manoObraTotal());
+}
 function agregarItemMaterial() {
   const sel = document.getElementById("matSelect");
   const matId = sel.value;
