@@ -704,7 +704,9 @@ async function guardar() {
       materiales: materialesTotal(),
       materialesItems: itemsActuales,
       horas: Number(document.getElementById("f-horas").value) || 0,
-      total: Number(document.getElementById("f-total").value) || 0,
+tarifa: Number(document.getElementById("f-tarifa").value) || 0,
+margen: Number(document.getElementById("f-margen").value) || 0,
+total: Number(document.getElementById("f-total").value) || 0,
       notas: document.getElementById("f-notas").value.trim(),
       fotos: fotosActuales
     };
