@@ -1225,6 +1225,7 @@ render();
     });
     db.collection("clientes").onSnapshot((snap) => {
   clientes = snap.docs.map(d => d.data());
+  renderClientesList();
 });
 
   } catch (error) {
