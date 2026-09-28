@@ -193,7 +193,12 @@ select {
 <div class="overlay" id="overlay">
   <div class="sheet">
     <h2 id="sheetTitle">Nuevo ingreso</h2>
-    <div class="field"><label>Cliente</label><input id="f-cliente" placeholder="Nombre del cliente"></div>
+  <div class="field">
+  <label>Cliente</label>
+  <select id="f-cliente">
+    <option value="">Seleccionar cliente...</option>
+  </select>
+</div>
     <div class="field"><label>Teléfono</label><input id="f-telefono" placeholder="Opcional"></div>
     <div class="grid2">
       <div class="field"><label>Tipo de motor</label>
