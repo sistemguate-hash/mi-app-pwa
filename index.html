@@ -955,6 +955,9 @@ on("btnCancel", "onclick", cerrarSheet);
 on("btnSave", "onclick", guardar);
 on("search", "oninput", (e) => { busqueda = e.target.value; render(); });
 on("btnCatalogo", "onclick", abrirCatalogo);
+on("btnClientes", "onclick", () => {
+  document.getElementById("clientesOverlay").classList.add("open");
+});
 on("btnCatClose", "onclick", cerrarCatalogo);
 on("catOverlay", "onclick", (e) => { if (e.target.id === "catOverlay") cerrarCatalogo(); });
 on("btnCatSave", "onclick", guardarMaterialCatalogo);
