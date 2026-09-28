@@ -381,7 +381,21 @@ function cardHtml(o) {
         <select class="sel-estado">${ESTADOS.map(e => `<option ${e===o.estado?"selected":""}>${e}</option>`).join("")}</select>
       </div>
       ${o.notas ? `<div class="row2" style="color:var(--text-dim); font-size:13px;">${escapeHtml(o.notas)}</div>` : ""}
-      <div class="row2" style="color:var(--text-dim); font-size:12.5px;">Materiales ${fmtQ(o.materiales)} · Mano de obra ${o.horas || 0}h</div>
+<div class="row2" style="color:var(--text-dim); font-size:12.5px;">
+  <strong>Presupuesto</strong>
+</div>
+<div class="row2" style="color:var(--text-dim); font-size:12.5px;">
+  Materiales: ${fmtQ(o.materiales)}
+</div>
+<div class="row2" style="color:var(--text-dim); font-size:12.5px;">
+  Mano de obra: ${o.horas || 0} h × ${fmtQ(o.tarifa || 0)}/h = ${fmtQ((o.horas || 0) * (o.tarifa || 0))}
+</div>
+<div class="row2" style="color:var(--text-dim); font-size:12.5px;">
+  Margen / adicional: ${fmtQ(o.margen || 0)}
+</div>
+<div class="row2" style="font-weight:700;">
+  Total presupuesto: ${fmtQ(o.total)}
+</div>
       ${(o.materialesItems && o.materialesItems.length) ? `<div style="margin-bottom:8px;">${o.materialesItems.map(it => `<div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-dim); padding:2px 0;"><span>${escapeHtml(it.nombre)} ×${it.cantidad}${it.unidad ? " " + escapeHtml(it.unidad) : ""}</span><span>${fmtQ(it.subtotal)}</span></div>`).join("")}</div>` : ""}
       ${(o.fotos && o.fotos.length) ? `<div class="card-fotos">${o.fotos.map(f => `<img src="${f.url}" data-url="${f.url}" class="foto-view">`).join("")}</div>` : ""}
       <div class="detail-actions">
