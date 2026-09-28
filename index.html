@@ -675,7 +675,10 @@ function abrirSheetEditar(id) {
   document.getElementById("f-marca").value = o.marca || "";
   document.getElementById("f-falla").value = o.falla || "";
   document.getElementById("f-horas").value = o.horas || "";
-  document.getElementById("f-total").value = o.total || "";
+document.getElementById("f-tarifa").value = o.tarifa || "";
+document.getElementById("f-margen").value = o.margen || "";
+document.getElementById("f-total").value = o.total || "";
+actualizarManoObra();
   document.getElementById("f-notas").value = o.notas || "";
   renderFotosRow();
   renderCatSelect();
