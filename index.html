@@ -619,7 +619,41 @@ async function guardarMaterialCatalogo() {
   limpiarFormCatalogo();
   renderCatList(); renderCatSelect();
 }
+async function guardarCliente() {
+  const nombre = document.getElementById("cli-nombre").value.trim();
 
+  if (!nombre) {
+    document.getElementById("cli-nombre").focus();
+    return;
+  }
+
+  const cliente = {
+    id: "cli" + Date.now(),
+    nombre,
+    nit: document.getElementById("cli-nit").value.trim(),
+    telefono: document.getElementById("cli-telefono").value.trim(),
+    direccion: document.getElementById("cli-direccion").value.trim(),
+    notas: document.getElementById("cli-notas").value.trim()
+  };
+
+  clientes.push(cliente);
+
+  if (db) {
+    try {
+      await db.doc("clientes/" + cliente.id).set(cliente);
+    } catch (e) {
+      alert("No se pudo guardar el cliente: " + (e && e.code ? e.code : e));
+    }
+  }
+
+  document.getElementById("cli-nombre").value = "";
+  document.getElementById("cli-nit").value = "";
+  document.getElementById("cli-telefono").value = "";
+  document.getElementById("cli-direccion").value = "";
+  document.getElementById("cli-notas").value = "";
+
+  renderClientesList();
+}
 function renderItemsMateriales() {
   const el = document.getElementById("itemsMateriales");
   if (!el) return;
