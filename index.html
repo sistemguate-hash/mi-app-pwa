@@ -1038,6 +1038,13 @@ on("btnCatClose", "onclick", cerrarCatalogo);
 on("catOverlay", "onclick", (e) => { if (e.target.id === "catOverlay") cerrarCatalogo(); });
 on("btnCatSave", "onclick", guardarMaterialCatalogo);
 on("btnCliSave", "onclick", guardarCliente);
+on("f-cliente", "onchange", () => {
+  const id = document.getElementById("f-cliente").value;
+  const cliente = clientes.find(c => c.id === id);
+
+  document.getElementById("f-telefono").value =
+    cliente ? (cliente.telefono || "") : "";
+});
 on("btnCliClose", "onclick", () => {
   document.getElementById("clientesOverlay").classList.remove("open");
 });
