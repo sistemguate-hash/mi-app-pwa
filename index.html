@@ -817,7 +817,10 @@ function cerrarSheet() { document.getElementById("overlay").classList.remove("op
 
 async function guardar() {
   try {
-    const cliente = document.getElementById("f-cliente").value.trim();
+  const clienteId = document.getElementById("f-cliente").value;
+const clienteObj = clientes.find(c => c.id === clienteId);
+
+const cliente = clienteObj ? clienteObj.nombre : "";
     if (!cliente) {
       alert("Ingresa el nombre del cliente antes de guardar.");
       document.getElementById("f-cliente").focus();
