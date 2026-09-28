@@ -659,6 +659,21 @@ async function guardarCliente() {
 
   renderClientesList();
 }
+function renderClientesSelect() {
+  const sel = document.getElementById("f-cliente");
+  if (!sel) return;
+
+  const actual = sel.value;
+
+  sel.innerHTML = '<option value="">Seleccionar cliente...</option>' +
+    clientes.map(c =>
+      `<option value="${escapeHtml(c.id)}">${escapeHtml(c.nombre)}</option>`
+    ).join("");
+
+  if (clientes.some(c => c.id === actual)) {
+    sel.value = actual;
+  }
+}
 function renderClientesList() {
   const el = document.getElementById("clientesList");
   if (!el) return;
