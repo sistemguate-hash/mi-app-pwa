@@ -337,8 +337,17 @@ function renderList() {
 
   items.forEach(o => {
     const card = document.getElementById("card-" + o.id);
-    card.querySelector(".card-top").onclick = () => { openId = (openId === o.id ? null : o.id); render(); };
-    card.querySelector(".card-bottom").onclick = () => { openId = (openId === o.id ? null : o.id); render(); };
+    card.querySelector(".card-top").onclick = () => {
+  openId = (openId === o.id ? null : o.id);
+  localStorage.setItem("ordenAbiertaId", openId || "");
+  render();
+};
+
+card.querySelector(".card-bottom").onclick = () => {
+  openId = (openId === o.id ? null : o.id);
+  localStorage.setItem("ordenAbiertaId", openId || "");
+  render();
+};
     const sel = card.querySelector(".sel-estado");
     if (sel) sel.onchange = () => updateEstado(o.id, sel.value);
     const delBtn = card.querySelector(".btn-del");
