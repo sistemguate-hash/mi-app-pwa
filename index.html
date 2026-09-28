@@ -1119,6 +1119,9 @@ render();
         renderCatList();
       }
     });
+    db.collection("clientes").onSnapshot((snap) => {
+  clientes = snap.docs.map(d => d.data());
+});
 
   } catch (error) {
     console.error("Error iniciando IndexedDB:", error);
