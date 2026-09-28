@@ -262,7 +262,48 @@ select {
     </div>
   </div>
 </div>
+<div class="overlay" id="clientesOverlay">
+  <div class="sheet">
+    <h2>Clientes</h2>
 
+    <div class="field">
+      <label>Nombre / Razón social</label>
+      <input id="cli-nombre" placeholder="Ej. Industrias ABC">
+    </div>
+
+    <div class="grid2">
+      <div class="field">
+        <label>NIT</label>
+        <input id="cli-nit" placeholder="Ej. 1234567-8">
+      </div>
+
+      <div class="field">
+        <label>Teléfono</label>
+        <input id="cli-telefono" placeholder="Ej. 5555-5555">
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Dirección</label>
+      <input id="cli-direccion" placeholder="Dirección del cliente">
+    </div>
+
+    <div class="field">
+      <label>Notas</label>
+      <textarea id="cli-notas" placeholder="Información adicional"></textarea>
+    </div>
+
+    <div class="sheet-actions">
+      <button class="btn-primary" id="btnCliSave">Agregar cliente</button>
+    </div>
+
+    <div id="clientesList" style="margin-top:16px;"></div>
+
+    <div class="sheet-actions" style="margin-top:14px;">
+      <button class="btn-cancel" id="btnCliClose" style="flex:1;">Cerrar</button>
+    </div>
+  </div>
+</div>
 <script>
 const ESTADOS = ["Recibido", "Diagnóstico", "Rebobinado", "Listo", "Entregado"];
 let db = null;
