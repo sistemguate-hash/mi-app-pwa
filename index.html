@@ -449,7 +449,12 @@ function renderList() {
   let items = [...ordenes];
   if (filtroEstado !== "Todos") items = items.filter(o => o.estado === filtroEstado);
 if (busqueda.trim()) {
-  const q = busqueda.toLowerCase();
+  const normalizar = (valor) =>
+    String(valor ?? "")
+      .toLowerCase()
+      .replace(/[\s-]/g, "");
+
+  const q = normalizar(busqueda);
 
   items = items.filter(o => {
     const texto = [
@@ -464,8 +469,8 @@ if (busqueda.trim()) {
       "ORD-" + ordenNumero(o.id)
     ]
       .filter(v => v !== undefined && v !== null)
-      .join(" ")
-      .toLowerCase();
+      .map(normalizar)
+      .join(" ");
 
     return texto.includes(q);
   });
