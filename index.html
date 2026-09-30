@@ -501,9 +501,8 @@ function cardHtml(o) {
       <div>
         <div class="ord mono">ORD-${ordenNumero(o.id)} · ${fmtFecha(o.fechaIngreso)}</div>
         <div class="cliente">${escapeHtml(o.cliente || "Sin nombre")}</div>
-<div class="motor-line">Tipo: ${escapeHtml(o.tipo)}${o.potencia ? " · HP: " + escapeHtml(o.potencia) : ""}${o.nit ? " · NIT: " + escapeHtml(o.nit) : ""}${o.falla ? `<div class="falla">${escapeHtml(o.falla)}</div>` : ""}
-        ${o.falla ? `<div class="falla">${escapeHtml(o.falla)}</div>` : ""}
-      </div>
+<div class="motor-line">Tipo: ${escapeHtml(o.tipo)}${o.potencia ? " · HP: " + escapeHtml(o.potencia) : ""}${o.nit ? " · NIT: " + escapeHtml(o.nit) : ""}</div>
+${o.falla ? `<div class="falla">${escapeHtml(o.falla)}</div>` : ""}
     </div>
     <div class="card-bottom">
       <span class="badge badge-${o.estado}">${o.estado}</span>
