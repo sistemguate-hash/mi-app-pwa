@@ -846,7 +846,7 @@ function renderClientesList() {
     ).length;
 
     return `
-      <div class="cat-row">
+    <div class="cat-row" data-cliente-id="${escapeHtml(c.id)}" style="cursor:pointer;">
         <div>
           <strong>${escapeHtml(c.nombre)}</strong>
 
