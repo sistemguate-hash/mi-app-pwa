@@ -1353,7 +1353,7 @@ document.getElementById("clientesList").onclick = (e) => {
   // El botón Editar debe seguir funcionando normalmente
   if (e.target.closest(".btn-edit-cliente")) return;
 
-  const clienteId = fila.dataset.clientId;
+const clienteId = fila.dataset.clienteId;
   if (!clienteId) return;
 
   abrirFichaCliente(clienteId);
