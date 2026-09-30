@@ -168,6 +168,73 @@ select {
 }
 .cat-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); gap: 10px; }
 .mat-total { text-align: right; font-size: 13px; font-weight: 600; margin-top: 4px; }
+/* ===== LISTA DE ÓRDENES COMPACTA ===== */
+
+.card {
+  position: relative;
+  padding: 8px 10px;
+  margin-bottom: 6px;
+  border-radius: 9px;
+}
+
+.card-top {
+  display: block;
+  padding-right: 105px;
+}
+
+.ord {
+  font-size: 10.5px;
+  line-height: 1.2;
+  margin-bottom: 2px;
+}
+
+.cliente {
+  font-size: 14px;
+  line-height: 1.2;
+  margin: 0 0 2px;
+}
+
+.motor-line {
+  font-size: 11.5px;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.falla {
+  display: none;
+}
+
+.card-bottom {
+  position: absolute;
+  right: 10px;
+  bottom: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+  margin: 0;
+}
+
+.badge {
+  font-size: 10px;
+  padding: 3px 7px;
+}
+
+.total {
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+/* Mantener el detalle expandido con su tamaño normal */
+.detail {
+  margin-top: 8px;
+}
+
+.detail.open {
+  display: block;
+}
 </style>
 </head>
 <body>
