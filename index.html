@@ -770,8 +770,19 @@ function renderClientesList() {
           ${c.telefono ? " · Tel: " + escapeHtml(c.telefono) : ""}
         </div>
       </div>
+
+      <button
+        type="button"
+        class="btn-sm btn-edit btn-edit-cliente"
+        data-id="${escapeHtml(c.id)}">
+        Editar
+      </button>
     </div>
   `).join("");
+
+  el.querySelectorAll(".btn-edit-cliente").forEach(btn => {
+    btn.onclick = () => editarCliente(btn.dataset.id);
+  });
 }
 function renderItemsMateriales() {
   const el = document.getElementById("itemsMateriales");
