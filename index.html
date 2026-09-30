@@ -728,8 +728,7 @@ async function guardarCliente() {
     return;
   }
 
-  const cliente = {
-    id: "cli" + Date.now(),
+  const datos = {
     nombre,
     nit: document.getElementById("cli-nit").value.trim(),
     telefono: document.getElementById("cli-telefono").value.trim(),
@@ -737,21 +736,59 @@ async function guardarCliente() {
     notas: document.getElementById("cli-notas").value.trim()
   };
 
-  clientes.push(cliente);
+  // EDITAR CLIENTE EXISTENTE
+  if (editClienteId) {
+    const idx = clientes.findIndex(c => c.id === editClienteId);
 
-  if (db) {
-    try {
-      await db.doc("clientes/" + cliente.id).set(cliente);
-    } catch (e) {
-      alert("No se pudo guardar el cliente: " + (e && e.code ? e.code : e));
+    if (idx > -1) {
+      const clienteActualizado = {
+        ...clientes[idx],
+        ...datos
+      };
+
+      clientes[idx] = clienteActualizado;
+
+      if (db) {
+        try {
+          await db.doc("clientes/" + editClienteId).update(datos);
+        } catch (e) {
+          alert("No se pudo actualizar el cliente: " + (e && e.code ? e.code : e));
+          return;
+        }
+      }
+    }
+
+  // NUEVO CLIENTE
+  } else {
+    const cliente = {
+      id: "cli" + Date.now(),
+      ...datos
+    };
+
+    clientes.push(cliente);
+
+    if (db) {
+      try {
+        await db.doc("clientes/" + cliente.id).set(cliente);
+      } catch (e) {
+        alert("No se pudo guardar el cliente: " + (e && e.code ? e.code : e));
+        return;
+      }
     }
   }
 
+  // Limpiar formulario
   document.getElementById("cli-nombre").value = "";
   document.getElementById("cli-nit").value = "";
   document.getElementById("cli-telefono").value = "";
   document.getElementById("cli-direccion").value = "";
   document.getElementById("cli-notas").value = "";
+
+  // Volver al modo "Agregar cliente"
+  editClienteId = null;
+
+  const btn = document.getElementById("btnCliSave");
+  if (btn) btn.textContent = "Agregar cliente";
 
   renderClientesList();
 }
