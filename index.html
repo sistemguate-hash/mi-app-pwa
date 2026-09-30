@@ -1217,6 +1217,26 @@ on("btnClientes", "onclick", () => {
   renderClientesList();
   document.getElementById("clientesOverlay").classList.add("open");
 });
+document.getElementById("clientesList").onclick = (e) => {
+  const fila = e.target.closest(".cat-row");
+  if (!fila) return;
+
+  const clienteId = fila.dataset.clienteId;
+  const cliente = clientes.find(c => c.id === clienteId);
+  if (!cliente) return;
+
+  alert(
+    "Cliente: " + (cliente.nombre || "") +
+    "\nNIT: " + (cliente.nit || "Sin NIT") +
+    "\nTeléfono: " + (cliente.telefono || "Sin teléfono") +
+    "\nDirección: " + (cliente.direccion || "Sin dirección") +
+    "\nÓrdenes: " +
+    ordenes.filter(o =>
+      (o.cliente || "").trim().toLowerCase() ===
+      (cliente.nombre || "").trim().toLowerCase()
+    ).length
+  );
+};
 on("btnCatClose", "onclick", cerrarCatalogo);
 on("catOverlay", "onclick", (e) => { if (e.target.id === "catOverlay") cerrarCatalogo(); });
 on("btnCatSave", "onclick", guardarMaterialCatalogo);
