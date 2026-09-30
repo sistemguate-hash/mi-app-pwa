@@ -448,10 +448,28 @@ function renderPills() {
 function renderList() {
   let items = [...ordenes];
   if (filtroEstado !== "Todos") items = items.filter(o => o.estado === filtroEstado);
-  if (busqueda.trim()) {
-    const q = busqueda.toLowerCase();
-    items = items.filter(o => (o.cliente + " " + o.marca + " " + o.tipo).toLowerCase().includes(q));
-  }
+if (busqueda.trim()) {
+  const q = busqueda.toLowerCase();
+
+  items = items.filter(o => {
+    const texto = [
+      o.cliente,
+      o.nit,
+      o.telefono,
+      o.marca,
+      o.tipo,
+      o.potencia,
+      o.voltaje,
+      o.falla,
+      "ORD-" + ordenNumero(o.id)
+    ]
+      .filter(v => v !== undefined && v !== null)
+      .join(" ")
+      .toLowerCase();
+
+    return texto.includes(q);
+  });
+}
   items.sort((a,b) => new Date(b.fechaIngreso) - new Date(a.fechaIngreso));
 
   const list = document.getElementById("list");
