@@ -443,7 +443,8 @@ function cardHtml(o) {
       <span class="total">${fmtQ(o.total)}</span>
     </div>
     <div class="detail ${abierto ? "open" : ""}">
-      ${o.telefono ? `<div class="row2">📞 ${escapeHtml(o.telefono)}</div>` : ""}
+${o.telefono ? `<div class="row2">📞 ${escapeHtml(o.telefono)}</div>` : ""}
+${o.nit ? `<div class="row2">🪪 NIT: ${escapeHtml(o.nit)}</div>` : ""}
       <div class="row2">
         <select class="sel-estado">${ESTADOS.map(e => `<option ${e===o.estado?"selected":""}>${e}</option>`).join("")}</select>
       </div>
