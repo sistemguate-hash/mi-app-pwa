@@ -1346,6 +1346,9 @@ on("btnClientes", "onclick", () => {
   renderClientesList();
   document.getElementById("clientesOverlay").classList.add("open");
 });
+document.getElementById("btnCerrarFichaCliente").onclick = () => {
+  document.getElementById("clienteFichaOverlay").classList.remove("open");
+};
 document.getElementById("clientesList").onclick = (e) => {
   const fila = e.target.closest(".cat-row");
   if (!fila) return;
