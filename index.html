@@ -1057,6 +1057,9 @@ on("f-cliente", "onchange", () => {
 
   document.getElementById("f-telefono").value =
     cliente ? (cliente.telefono || "") : "";
+
+  document.getElementById("f-nit").value =
+    cliente ? (cliente.nit || "") : "";
 });
 on("btnCliClose", "onclick", () => {
   document.getElementById("clientesOverlay").classList.remove("open");
