@@ -449,10 +449,10 @@ function renderList() {
   let items = [...ordenes];
   if (filtroEstado !== "Todos") items = items.filter(o => o.estado === filtroEstado);
 if (busqueda.trim()) {
-  const normalizar = (valor) =>
-    String(valor ?? "")
-      .toLowerCase()
-      .replace(/[\s-]/g, "");
+const normalizar = (valor) =>
+  String(valor ?? "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "");
 
   const q = normalizar(busqueda);
 
