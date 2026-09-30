@@ -504,7 +504,8 @@ function cardHtml(o) {
 <div class="motor-line">Tipo: ${escapeHtml(o.tipo)}${o.potencia ? " · HP: " + escapeHtml(o.potencia) : ""}${o.nit ? " · NIT: " + escapeHtml(o.nit) : ""}</div>
 ${o.falla ? `<div class="falla">${escapeHtml(o.falla)}</div>` : ""}
     </div>
-    <div class="card-bottom">
+  </div>
+  <div class="card-bottom">
       <span class="badge badge-${o.estado}">${o.estado}</span>
       <span class="total">${fmtQ(o.total)}</span>
     </div>
