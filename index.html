@@ -458,7 +458,7 @@ function renderList() {
     list.innerHTML = `<div class="empty">Sin motores en esta vista. Toca "Nuevo ingreso" para registrar uno.</div>`;
     return;
   }
-  list.innerHTML = items.map(o => cardHtml(o)).join("");
+list.innerHTML = items.map(o => cardHtml(o)).join("");
 
   items.forEach(o => {
     const card = document.getElementById("card-" + o.id);
