@@ -703,6 +703,23 @@ async function guardarMaterialCatalogo() {
   limpiarFormCatalogo();
   renderCatList(); renderCatSelect();
 }
+function editarCliente(id) {
+  const cliente = clientes.find(c => c.id === id);
+  if (!cliente) return;
+
+  editClienteId = id;
+
+  document.getElementById("cli-nombre").value = cliente.nombre || "";
+  document.getElementById("cli-nit").value = cliente.nit || "";
+  document.getElementById("cli-telefono").value = cliente.telefono || "";
+  document.getElementById("cli-direccion").value = cliente.direccion || "";
+  document.getElementById("cli-notas").value = cliente.notas || "";
+
+  const btn = document.getElementById("btnCliSave");
+  if (btn) btn.textContent = "Actualizar cliente";
+
+  document.getElementById("cli-nombre").focus();
+}
 async function guardarCliente() {
   const nombre = document.getElementById("cli-nombre").value.trim();
 
