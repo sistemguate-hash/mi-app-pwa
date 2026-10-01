@@ -1,4 +1,4 @@
-const CACHE_NAME = "rebobinado-v26";
+const CACHE_NAME = "rebobinado-v27";
 
 const APP_SHELL = [
   "./",
