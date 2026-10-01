@@ -1102,7 +1102,6 @@ function abrirSheetEditar(id) {
   fotosActuales = [...(o.fotos || [])];
   itemsActuales = [...(o.materialesItems || [])];
   document.getElementById("sheetTitle").textContent = "Editar ORD-" + ordenNumero(id);
-  document.getElementById("f-cliente").value = o.cliente || "";
   document.getElementById("f-telefono").value = o.telefono || "";
   document.getElementById("f-tipo").value = o.tipo || "Monofásico";
   document.getElementById("f-potencia").value = o.potencia || "";
@@ -1114,10 +1113,22 @@ document.getElementById("f-tarifa").value = o.tarifa || "";
 document.getElementById("f-margen").value = o.margen || "";
 document.getElementById("f-total").value = o.total || "";
 actualizarManoObra();
-  document.getElementById("f-notas").value = o.notas || "";
-  renderFotosRow();
-  renderCatSelect();
-  renderItemsMateriales();
+document.getElementById("f-notas").value = o.notas || "";
+
+renderFotosRow();
+
+renderClientesSelect();
+
+const clienteGuardado = clientes.find(c =>
+  (c.nombre || "").trim().toLowerCase() ===
+  (o.cliente || "").trim().toLowerCase()
+);
+
+document.getElementById("f-cliente").value =
+  clienteGuardado ? clienteGuardado.id : "";
+
+renderCatSelect();
+renderItemsMateriales();
   document.getElementById("overlay").classList.add("open");
 }
 
@@ -1585,6 +1596,7 @@ render();
   clientes = snap.docs.map(d => d.data());
   renderClientesList();
   renderClientesSelect();
+
 });
 
   } catch (error) {
