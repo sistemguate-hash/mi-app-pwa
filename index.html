@@ -279,7 +279,11 @@ select {
 </div>
     <div class="grid2">
       <div class="field"><label>Tipo de motor</label>
-        <select id="f-tipo"><option>Monofásico</option><option>Trifásico</option></select>
+    <select id="f-tipo">
+  <option value="">Seleccionar tipo de motor...</option>
+  <option value="Monofásico">Monofásico</option>
+  <option value="Trifásico">Trifásico</option>
+</select>
       </div>
       <div class="field"><label>HP / kW</label><input id="f-potencia" placeholder="Ej. 5 HP"></div>
     </div>
@@ -1078,17 +1082,24 @@ function agregarItemMaterial() {
   renderItemsMateriales();
   actualizarTotalPresupuesto();
 }
-
 function abrirSheet() {
-  editId = null;
-  fotosActuales = [];
-  itemsActuales = [];
-  document.getElementById("sheetTitle").textContent = "Nuevo ingreso";
-  ["cliente","telefono","potencia","voltaje","marca","falla","horas","total","notas"].forEach(k => {
-    const el = document.getElementById("f-" + k);
-    if (el) el.value = "";
-  });
-  document.getElementById("f-tipo").value = "Monofásico";
+[
+  "cliente",
+  "telefono",
+  "nit",
+  "potencia",
+  "voltaje",
+  "marca",
+  "falla",
+  "total",
+  "tarifa",
+  "margen",
+  "notas"
+].forEach(k => {
+  const el = document.getElementById("f-" + k);
+  if (el) el.value = "";
+});
+  document.getElementById("f-tipo").value = "";
   renderFotosRow();
   renderCatSelect();
   renderItemsMateriales();
@@ -1103,7 +1114,7 @@ function abrirSheetEditar(id) {
   itemsActuales = [...(o.materialesItems || [])];
   document.getElementById("sheetTitle").textContent = "Editar ORD-" + ordenNumero(id);
   document.getElementById("f-telefono").value = o.telefono || "";
-  document.getElementById("f-tipo").value = o.tipo || "Monofásico";
+  document.getElementById("f-tipo").value = o.tipo || "";
   document.getElementById("f-potencia").value = o.potencia || "";
   document.getElementById("f-voltaje").value = o.voltaje || "";
   document.getElementById("f-marca").value = o.marca || "";
