@@ -1126,8 +1126,9 @@ const clienteGuardado = clientes.find(c =>
 
 document.getElementById("f-cliente").value =
   clienteGuardado ? clienteGuardado.id : "";
-  document.getElementById("f-nit").value =
-  o.nit || (clienteGuardado ? clienteGuardado.nit || "" : "");
+document.getElementById("f-nit").value =
+  (o.nit || "").trim() ||
+  (clienteGuardado?.nit || "").trim();
 
 renderCatSelect();
 renderItemsMateriales();
