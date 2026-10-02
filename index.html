@@ -1083,26 +1083,42 @@ function agregarItemMaterial() {
   actualizarTotalPresupuesto();
 }
 function abrirSheet() {
-[
-  "cliente",
-  "telefono",
-  "nit",
-  "potencia",
-  "voltaje",
-  "marca",
-  "falla",
-  "total",
-  "tarifa",
-  "margen",
-  "notas"
-].forEach(k => {
-  const el = document.getElementById("f-" + k);
-  if (el) el.value = "";
-});
+
+  // NUEVO INGRESO: limpiar completamente el estado anterior
+  editId = null;
+  itemsActuales = [];
+  fotosActuales = [];
+
+  // Restablecer título
+  document.getElementById("sheetTitle").textContent = "Nuevo ingreso";
+
+  // Limpiar campos del formulario
+  [
+    "cliente",
+    "telefono",
+    "nit",
+    "potencia",
+    "voltaje",
+    "marca",
+    "falla",
+    "total",
+    "tarifa",
+    "margen",
+    "notas"
+  ].forEach(k => {
+    const el = document.getElementById("f-" + k);
+    if (el) el.value = "";
+  });
+
+  // Tipo de motor inicia sin selección
   document.getElementById("f-tipo").value = "";
+
+  // Restablecer elementos visuales
   renderFotosRow();
   renderCatSelect();
   renderItemsMateriales();
+
+  // Abrir formulario
   document.getElementById("overlay").classList.add("open");
 }
 
