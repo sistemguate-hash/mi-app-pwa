@@ -1094,22 +1094,28 @@ function abrirSheet() {
 
   // Limpiar campos del formulario
   [
-    "cliente",
-    "telefono",
-    "nit",
-    "potencia",
-    "voltaje",
-    "marca",
-    "falla",
-    "horas",
-    "total",
-    "tarifa",
-    "margen",
-    "notas"
-  ].forEach(k => {
-    const el = document.getElementById("f-" + k);
-    if (el) el.value = "";
-  });
+  "cliente",
+  "telefono",
+  "nit",
+  "potencia",
+  "voltaje",
+  "marca",
+  "falla",
+  "notas"
+].forEach(k => {
+  const el = document.getElementById("f-" + k);
+  if (el) el.value = "";
+});
+
+// Campos numéricos: todo nuevo ingreso inicia en cero
+document.getElementById("f-horas").value = 0;
+document.getElementById("f-tarifa").value = 0;
+document.getElementById("f-margen").value = 0;
+document.getElementById("f-total").value = 0;
+
+// Recalcular indicadores desde cero
+actualizarManoObra();
+actualizarTotalPresupuesto();
 
   // Tipo de motor inicia sin selección
   document.getElementById("f-tipo").value = "";
