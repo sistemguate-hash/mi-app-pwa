@@ -285,7 +285,27 @@ select {
   <option value="Trifásico">Trifásico</option>
 </select>
       </div>
-      <div class="field"><label>HP / kW</label><input id="f-potencia" placeholder="Ej. 5 HP"></div>
+<div class="field">
+  <label>Potencia</label>
+  <div class="row2" style="gap:8px;">
+    <input
+      id="f-potencia"
+      type="number"
+      inputmode="decimal"
+      placeholder="Ej. 5"
+      step="0.01"
+      style="flex:1;"
+    >
+
+    <select
+      id="f-unidad-potencia"
+      style="width:90px; flex:none;"
+    >
+      <option value="HP">HP</option>
+      <option value="kW">kW</option>
+    </select>
+  </div>
+</div>
     </div>
     <div class="grid2">
       <div class="field"><label>Voltaje</label><input id="f-voltaje" placeholder="Ej. 220V"></div>
@@ -546,7 +566,7 @@ function cardHtml(o) {
       <div>
         <div class="ord mono">ORD-${ordenNumero(o.id)} · ${fmtFecha(o.fechaIngreso)}</div>
         <div class="cliente">${escapeHtml(o.cliente || "Sin nombre")}</div>
-<div class="motor-line">Tipo: ${escapeHtml(o.tipo)}${o.potencia ? " · HP: " + escapeHtml(o.potencia) : ""}${o.nit ? " · NIT: " + escapeHtml(o.nit) : ""}</div>
+<div class="motor-line">Tipo: ${escapeHtml(o.tipo)}${o.potencia ? " · " + escapeHtml(o.potencia) + " " + escapeHtml(o.unidadPotencia || "HP") : ""}${o.nit ? " · NIT: " + escapeHtml(o.nit) : ""}</div>
 ${o.falla ? `<div class="falla">${escapeHtml(o.falla)}</div>` : ""}
     </div>
   </div>
@@ -1177,6 +1197,7 @@ function abrirSheetEditar(id) {
   document.getElementById("f-telefono").value = o.telefono || "";
   document.getElementById("f-tipo").value = o.tipo || "";
   document.getElementById("f-potencia").value = o.potencia || "";
+  document.getElementById("f-unidad-potencia").value = o.unidadPotencia || "HP";
   document.getElementById("f-voltaje").value = o.voltaje || "";
   document.getElementById("f-marca").value = o.marca || "";
   document.getElementById("f-falla").value = o.falla || "";
@@ -1226,6 +1247,7 @@ const cliente = clienteObj ? clienteObj.nombre : "";
       nit: document.getElementById("f-nit").value.trim(),
       tipo: document.getElementById("f-tipo").value,
       potencia: document.getElementById("f-potencia").value.trim(),
+      unidadPotencia: document.getElementById("f-unidad-potencia").value,
       voltaje: document.getElementById("f-voltaje").value.trim(),
       marca: document.getElementById("f-marca").value.trim(),
       falla: document.getElementById("f-falla").value.trim(),
