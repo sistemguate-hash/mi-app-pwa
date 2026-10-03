@@ -959,6 +959,9 @@ function abrirFichaCliente(clienteId) {
     }
   `;
 
+ document
+  .getElementById("clientesOverlay")
+  .classList.remove("open");
   document
     .getElementById("clienteFichaOverlay")
     .classList.add("open");
