@@ -325,13 +325,13 @@ select {
     </div>
     <div class="field"><label>Horas mano de obra</label><input id="f-horas" type="number" inputmode="decimal" placeholder="0"></div>
     <div class="mat-total">Mano de obra: <span id="manoObraLabel">Q0</span></div>
-    <div class="field"><label>Tarifa mano de obra (Q/h)</label><input id="f-tarifa" type="number" inputmode="decimal" placeholder="0" step="0.01"></div>
+    <div class="field"><label>Tarifa mano de obra (<span id="monedaTarifa">Q</span>/h)</label><input id="f-tarifa" type="number" inputmode="decimal" placeholder="0" step="0.01"></div>
     <div class="field">
-  <label>Margen / adicional (Q)</label>
+  <label>Margen / adicional (<span id="monedaMargen">Q</span>)</label>
   <input id="f-margen" type="number" inputmode="decimal" placeholder="0" step="0.01">
 </div>
 <div class="field">
-  <label>Total presupuesto (Q)</label>
+  <label>Total presupuesto (<span id="monedaTotal">Q</span>)</label>
   <div class="row2" style="flex-wrap:nowrap; align-items:center;">
     <input id="f-total" type="number" inputmode="decimal" placeholder="0" style="flex:1;">
   </div>
@@ -505,6 +505,17 @@ function renderNombreTaller() {
     el.textContent = obtenerNombreTaller();
   }
 }
+function renderEtiquetasMoneda() {
+  const moneda = localStorage.getItem("monedaSimbolo") || "Q";
+
+  const tarifa = document.getElementById("monedaTarifa");
+  const margen = document.getElementById("monedaMargen");
+  const total = document.getElementById("monedaTotal");
+
+  if (tarifa) tarifa.textContent = moneda;
+  if (margen) margen.textContent = moneda;
+  if (total) total.textContent = moneda;
+}
 
 function abrirConfiguracion() {
   const nombre = document.getElementById("configNombreTaller");
@@ -563,12 +574,12 @@ function ordenNumero(id) {
   const idx = sorted.findIndex(o => o.id === id);
   return String(idx + 1).padStart(3, "0");
 }
-
 function render() {
   renderStats();
   renderPills();
   renderList();
   renderNombreTaller();
+  renderEtiquetasMoneda();
 }
 
 function renderStats() {
