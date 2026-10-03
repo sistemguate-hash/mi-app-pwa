@@ -1689,6 +1689,7 @@ on("f-cliente", "onchange", () => {
     cliente ? (cliente.nit || "") : "";
 });
 on("btnCliClose", "onclick", () => {
+  cancelarEdicionCliente();
   document.getElementById("clientesOverlay").classList.remove("open");
 });
 on("btnAddMat", "onclick", agregarItemMaterial);
