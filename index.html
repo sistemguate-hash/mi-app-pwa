@@ -359,7 +359,7 @@ select {
       <div class="field"><label>Nombre</label><input id="cat-nombre" placeholder="Ej. Alambre esmaltado 18AWG"></div>
       <div class="field"><label>Unidad</label><input id="cat-unidad" placeholder="Ej. lb, m, unidad"></div>
     </div>
-    <div class="field"><label>Precio unitario (Q)</label><input id="cat-precio" type="number" inputmode="decimal" placeholder="0"></div>
+    <div class="field"><label>Precio unitario (<span id="monedaPrecioMaterial">Q</span>)</label><input id="cat-precio" type="number" inputmode="decimal" placeholder="0"></div>
     <div class="sheet-actions">
       <button class="btn-primary" id="btnCatSave">Agregar material</button>
     </div>
@@ -511,10 +511,12 @@ function renderEtiquetasMoneda() {
   const tarifa = document.getElementById("monedaTarifa");
   const margen = document.getElementById("monedaMargen");
   const total = document.getElementById("monedaTotal");
+  const precioMaterial = document.getElementById("monedaPrecioMaterial");
 
   if (tarifa) tarifa.textContent = moneda;
   if (margen) margen.textContent = moneda;
   if (total) total.textContent = moneda;
+  if (precioMaterial) precioMaterial.textContent = moneda;
 }
 
 function abrirConfiguracion() {
