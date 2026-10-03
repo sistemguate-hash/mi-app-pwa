@@ -400,9 +400,16 @@ select {
       <textarea id="cli-notas" placeholder="Información adicional"></textarea>
     </div>
 
-    <div class="sheet-actions">
-      <button class="btn-primary" id="btnCliSave">Agregar cliente</button>
-    </div>
+  <div class="sheet-actions">
+  <button class="btn-primary" id="btnCliSave">Agregar cliente</button>
+
+  <button
+    class="btn-cancel"
+    id="btnCliCancelEdit"
+    style="display:none;">
+    Cancelar actualización
+  </button>
+</div>
 
     <div id="clientesList" style="margin-top:16px;"></div>
 
@@ -904,6 +911,25 @@ function editarCliente(id) {
 
   const btn = document.getElementById("btnCliSave");
   if (btn) btn.textContent = "Actualizar cliente";
+
+  document.getElementById("cli-nombre").focus();
+  const btnCancelar = document.getElementById("btnCliCancelEdit");
+if (btnCancelar) btnCancelar.style.display = "block";
+}
+function cancelarEdicionCliente() {
+  editClienteId = null;
+
+  document.getElementById("cli-nombre").value = "";
+  document.getElementById("cli-nit").value = "";
+  document.getElementById("cli-telefono").value = "";
+  document.getElementById("cli-direccion").value = "";
+  document.getElementById("cli-notas").value = "";
+
+  const btn = document.getElementById("btnCliSave");
+  if (btn) btn.textContent = "Agregar cliente";
+
+  const btnCancelar = document.getElementById("btnCliCancelEdit");
+  if (btnCancelar) btnCancelar.style.display = "none";
 
   document.getElementById("cli-nombre").focus();
 }
@@ -1651,6 +1677,7 @@ on("btnCatClose", "onclick", cerrarCatalogo);
 on("catOverlay", "onclick", (e) => { if (e.target.id === "catOverlay") cerrarCatalogo(); });
 on("btnCatSave", "onclick", guardarMaterialCatalogo);
 on("btnCliSave", "onclick", guardarCliente);
+on("btnCliCancelEdit", "onclick", cancelarEdicionCliente);
 on("f-cliente", "onchange", () => {
   const id = document.getElementById("f-cliente").value;
   const cliente = clientes.find(c => c.id === id);
