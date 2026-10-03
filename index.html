@@ -1315,9 +1315,13 @@ async function exportarPDF(id, btn) {
       y += 8;
     };
     campo("Cliente:", o.cliente);
+    campo("NIT:", o.nit);
     campo("Teléfono:", o.telefono);
     campo("Tipo de motor:", o.tipo);
-    campo("Potencia:", o.potencia);
+    campo(
+  "Potencia:",
+  (o.potencia || "") + " " + (o.unidadPotencia || "HP")
+);
     campo("Voltaje:", o.voltaje);
     campo("Marca:", o.marca);
     y += 2; doc.line(14, y, 196, y); y += 8;
