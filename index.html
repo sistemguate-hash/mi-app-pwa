@@ -907,6 +907,42 @@ function editarCliente(id) {
 
   document.getElementById("cli-nombre").focus();
 }
+async function eliminarCliente(clienteId) {
+  const cliente = clientes.find(c => c.id === clienteId);
+  if (!cliente) return;
+
+  const totalOrdenes = ordenes.filter(o =>
+    (o.cliente || "").trim().toLowerCase() ===
+    (cliente.nombre || "").trim().toLowerCase()
+  ).length;
+
+  const mensaje = totalOrdenes
+    ? `¿Eliminar la ficha de "${cliente.nombre}"?\n\nEste cliente tiene ${totalOrdenes} orden(es) registrada(s).\n\nLas órdenes NO se eliminarán; solo se eliminará la ficha del cliente.`
+    : `¿Eliminar la ficha de "${cliente.nombre}"?`;
+
+  if (!confirm(mensaje)) return;
+
+  if (db) {
+    try {
+      await db.doc("clientes/" + clienteId).delete();
+    } catch (e) {
+      alert(
+        "No se pudo eliminar el cliente: " +
+        (e && e.message ? e.message : e)
+      );
+      return;
+    }
+  } else {
+    clientes = clientes.filter(c => c.id !== clienteId);
+    renderClientesList();
+    renderClientesSelect();
+  }
+
+  editClienteId = null;
+
+  renderClientesList();
+  renderClientesSelect();
+}
 async function guardarCliente() {
   const nombre = document.getElementById("cli-nombre").value.trim();
 
@@ -1180,6 +1216,12 @@ function renderClientesList() {
           data-id="${escapeHtml(c.id)}">
           Editar
         </button>
+        <button
+  type="button"
+  class="btn-sm danger btn-del-cliente"
+  data-id="${escapeHtml(c.id)}">
+  Eliminar
+</button>
       </div>
     `;
   }).join("");
@@ -1187,6 +1229,9 @@ function renderClientesList() {
   el.querySelectorAll(".btn-edit-cliente").forEach(btn => {
     btn.onclick = () => editarCliente(btn.dataset.id);
   });
+  el.querySelectorAll(".btn-del-cliente").forEach(btn => {
+  btn.onclick = () => eliminarCliente(btn.dataset.id);
+});
 }
 function renderItemsMateriales() {
   const el = document.getElementById("itemsMateriales");
@@ -1592,7 +1637,10 @@ document.getElementById("clientesList").onclick = (e) => {
   if (!fila) return;
 
   // El botón Editar debe seguir funcionando normalmente
-  if (e.target.closest(".btn-edit-cliente")) return;
+  if (
+  e.target.closest(".btn-edit-cliente") ||
+  e.target.closest(".btn-del-cliente")
+) return;
 
 const clienteId = fila.dataset.clienteId;
   if (!clienteId) return;
