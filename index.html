@@ -965,7 +965,20 @@ function abrirFichaCliente(clienteId) {
         font-weight:400;
         margin-top:3px;
       ">
-        Ver orden →
+  <button
+  type="button"
+  style="
+    border:0;
+    background:none;
+    padding:0;
+    color:var(--text-dim);
+    font-size:11px;
+    cursor:pointer;
+  "
+  onclick="openId='${o.id}'; localStorage.setItem('ordenAbiertaId', openId); document.getElementById('clienteFichaOverlay').classList.remove('open'); render();"
+>
+  Ver orden →
+</button>
       </div>
     </div>
   </div>
