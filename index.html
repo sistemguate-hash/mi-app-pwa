@@ -546,7 +546,410 @@ function renderEtiquetasMoneda() {
   if (total) total.textContent = moneda;
   if (precioMaterial) precioMaterial.textContent = moneda;
 }
+// ============================================================
+// PERFILES TÉCNICOS DE TALLER
+// ============================================================
 
+const PERFILES_TALLER = {
+
+  "motores-electricos": {
+    nombre: "Motores eléctricos",
+
+    campos: [
+      {
+        id: "tipoMotor",
+        nombre: "Tipo de motor",
+        tipo: "select",
+        obligatorio: true,
+        opciones: [
+          "Monofásico",
+          "Trifásico",
+          "Corriente continua (DC)",
+          "Otro"
+        ]
+      },
+      {
+        id: "marca",
+        nombre: "Marca",
+        tipo: "text",
+        obligatorio: false
+      },
+      {
+        id: "potencia",
+        nombre: "Potencia",
+        tipo: "number",
+        obligatorio: false
+      },
+      {
+        id: "unidadPotencia",
+        nombre: "Unidad de potencia",
+        tipo: "select",
+        obligatorio: false,
+        opciones: ["HP", "kW"]
+      },
+      {
+        id: "voltaje",
+        nombre: "Voltaje",
+        tipo: "text",
+        obligatorio: false
+      },
+      {
+        id: "rpm",
+        nombre: "RPM",
+        tipo: "number",
+        obligatorio: false
+      },
+      {
+        id: "fases",
+        nombre: "Fases",
+        tipo: "select",
+        obligatorio: false,
+        opciones: ["1", "3", "Otra"]
+      }
+    ]
+  },
+
+  "automotriz": {
+    nombre: "Taller automotriz",
+
+    campos: [
+      {
+        id: "tipoVehiculo",
+        nombre: "Tipo de vehículo",
+        tipo: "select",
+        obligatorio: true,
+        opciones: [
+          "Sedán",
+          "Pickup",
+          "SUV",
+          "Camión",
+          "Motocicleta",
+          "Otro"
+        ]
+      },
+      {
+        id: "marca",
+        nombre: "Marca",
+        tipo: "text",
+        obligatorio: true
+      },
+      {
+        id: "modelo",
+        nombre: "Modelo",
+        tipo: "text",
+        obligatorio: true
+      },
+      {
+        id: "anio",
+        nombre: "Año",
+        tipo: "number",
+        obligatorio: true
+      },
+      {
+        id: "placa",
+        nombre: "Placa",
+        tipo: "text",
+        obligatorio: false
+      },
+      {
+        id: "kilometraje",
+        nombre: "Kilometraje",
+        tipo: "number",
+        obligatorio: false
+      },
+      {
+        id: "motor",
+        nombre: "Motor",
+        tipo: "text",
+        obligatorio: false
+      },
+      {
+        id: "cilindraje",
+        nombre: "Cilindraje",
+        tipo: "text",
+        obligatorio: false
+      },
+      {
+        id: "combustible",
+        nombre: "Combustible",
+        tipo: "select",
+        obligatorio: false,
+        opciones: [
+          "Gasolina",
+          "Diésel",
+          "Híbrido",
+          "Eléctrico",
+          "Otro"
+        ]
+      },
+      {
+        id: "transmision",
+        nombre: "Transmisión",
+        tipo: "select",
+        obligatorio: false,
+        opciones: [
+          "Manual",
+          "Automática",
+          "CVT",
+          "Otra"
+        ]
+      }
+    ]
+  },
+
+  "herreria": {
+    nombre: "Herrería",
+
+    campos: [
+      {
+        id: "tipoTrabajo",
+        nombre: "Tipo de trabajo",
+        tipo: "select",
+        obligatorio: true,
+        opciones: [
+          "Fabricación",
+          "Reparación",
+          "Instalación",
+          "Modificación",
+          "Otro"
+        ]
+      },
+      {
+        id: "material",
+        nombre: "Material",
+        tipo: "select",
+        obligatorio: true,
+        opciones: [
+          "Hierro",
+          "Acero",
+          "Acero inoxidable",
+          "Aluminio",
+          "Otro"
+        ]
+      },
+      {
+        id: "espesor",
+        nombre: "Espesor",
+        tipo: "number",
+        obligatorio: false,
+        unidad: "mm"
+      },
+      {
+        id: "largo",
+        nombre: "Largo",
+        tipo: "number",
+        obligatorio: false
+      },
+      {
+        id: "ancho",
+        nombre: "Ancho",
+        tipo: "number",
+        obligatorio: false
+      },
+      {
+        id: "alto",
+        nombre: "Alto",
+        tipo: "number",
+        obligatorio: false
+      },
+      {
+        id: "unidadMedida",
+        nombre: "Unidad de medida",
+        tipo: "select",
+        obligatorio: false,
+        opciones: ["mm", "cm", "m"]
+      },
+      {
+        id: "cantidad",
+        nombre: "Cantidad",
+        tipo: "number",
+        obligatorio: false,
+        unidad: "unidades"
+      },
+      {
+        id: "acabado",
+        nombre: "Acabado",
+        tipo: "select",
+        obligatorio: false,
+        opciones: [
+          "Natural",
+          "Pintura",
+          "Galvanizado",
+          "Otro"
+        ]
+      }
+    ]
+  },
+
+  "torno-industrial": {
+    nombre: "Torno industrial",
+
+    campos: [
+      {
+        id: "tipoTrabajo",
+        nombre: "Tipo de trabajo",
+        tipo: "select",
+        obligatorio: true,
+        opciones: [
+          "Fabricación",
+          "Reparación",
+          "Rectificado",
+          "Roscado",
+          "Ranurado",
+          "Otro"
+        ]
+      },
+      {
+        id: "material",
+        nombre: "Material",
+        tipo: "select",
+        obligatorio: true,
+        opciones: [
+          "Acero",
+          "Acero inoxidable",
+          "Aluminio",
+          "Bronce",
+          "Latón",
+          "Otro"
+        ]
+      },
+      {
+        id: "diametro",
+        nombre: "Diámetro",
+        tipo: "number",
+        obligatorio: false,
+        unidad: "mm"
+      },
+      {
+        id: "longitud",
+        nombre: "Longitud",
+        tipo: "number",
+        obligatorio: false,
+        unidad: "mm"
+      },
+      {
+        id: "cantidad",
+        nombre: "Cantidad",
+        tipo: "number",
+        obligatorio: true,
+        unidad: "unidades"
+      },
+      {
+        id: "tolerancia",
+        nombre: "Tolerancia",
+        tipo: "text",
+        obligatorio: false
+      },
+      {
+        id: "rosca",
+        nombre: "Rosca",
+        tipo: "text",
+        obligatorio: false
+      },
+      {
+        id: "diametroInterior",
+        nombre: "Diámetro interior",
+        tipo: "number",
+        obligatorio: false,
+        unidad: "mm"
+      },
+      {
+        id: "acabado",
+        nombre: "Acabado",
+        tipo: "text",
+        obligatorio: false
+      }
+    ]
+  },
+
+  "carpinteria": {
+    nombre: "Carpintería",
+
+    campos: [
+      {
+        id: "tipoTrabajo",
+        nombre: "Tipo de trabajo",
+        tipo: "select",
+        obligatorio: true,
+        opciones: [
+          "Fabricación",
+          "Reparación",
+          "Instalación",
+          "Restauración",
+          "Otro"
+        ]
+      },
+      {
+        id: "material",
+        nombre: "Material",
+        tipo: "select",
+        obligatorio: true,
+        opciones: [
+          "Madera sólida",
+          "MDF",
+          "Melamina",
+          "Plywood",
+          "Triplay",
+          "Otro"
+        ]
+      },
+      {
+        id: "largo",
+        nombre: "Largo",
+        tipo: "number",
+        obligatorio: false
+      },
+      {
+        id: "ancho",
+        nombre: "Ancho",
+        tipo: "number",
+        obligatorio: false
+      },
+      {
+        id: "alto",
+        nombre: "Alto",
+        tipo: "number",
+        obligatorio: false
+      },
+      {
+        id: "espesor",
+        nombre: "Espesor",
+        tipo: "number",
+        obligatorio: false,
+        unidad: "mm"
+      },
+      {
+        id: "unidadMedida",
+        nombre: "Unidad de medida",
+        tipo: "select",
+        obligatorio: false,
+        opciones: ["mm", "cm", "m"]
+      },
+      {
+        id: "cantidad",
+        nombre: "Cantidad",
+        tipo: "number",
+        obligatorio: false,
+        unidad: "unidades"
+      },
+      {
+        id: "acabado",
+        nombre: "Acabado",
+        tipo: "select",
+        obligatorio: false,
+        opciones: [
+          "Natural",
+          "Barniz",
+          "Pintura",
+          "Laca",
+          "Laminado",
+          "Otro"
+        ]
+      }
+    ]
+  }
+
+};
 function abrirConfiguracion() {
   const nombre = document.getElementById("configNombreTaller");
   const moneda = document.getElementById("configMoneda");
