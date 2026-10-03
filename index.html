@@ -1710,7 +1710,135 @@ render();
 // BASE DE DATOS LOCAL - IndexedDB
 (async function initDb() {
   try {
-    const DB_NAME = "taller-rebobinado";
+    async function migrarBaseAnterior() {
+      const DB_ANTERIOR = "taller-rebobinado";
+      const DB_NUEVA = "logitec-industrial";
+      const VERSION = 2;
+
+      if (!indexedDB.databases) {
+        console.warn("El navegador no permite detectar bases IndexedDB.");
+        return;
+      }
+
+      const bases = await indexedDB.databases();
+
+      const existeBaseAnterior = bases.some(
+        db => db.name === DB_ANTERIOR
+      );
+
+      if (!existeBaseAnterior) {
+        return;
+      }
+
+      const dbAnterior = await new Promise((resolve, reject) => {
+        const request = indexedDB.open(DB_ANTERIOR);
+
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+
+      const obtenerDatos = (storeName) => {
+        return new Promise((resolve, reject) => {
+          if (!dbAnterior.objectStoreNames.contains(storeName)) {
+            resolve([]);
+            return;
+          }
+
+          const tx = dbAnterior.transaction(storeName, "readonly");
+          const store = tx.objectStore(storeName);
+          const request = store.getAll();
+
+          request.onsuccess = () => resolve(request.result || []);
+          request.onerror = () => reject(request.error);
+        });
+      };
+
+      const ordenesAnteriores = await obtenerDatos("ordenes");
+      const materialesAnteriores = await obtenerDatos("materiales");
+      const clientesAnteriores = await obtenerDatos("clientes");
+
+      dbAnterior.close();
+
+      const dbNueva = await new Promise((resolve, reject) => {
+        const request = indexedDB.open(DB_NUEVA, VERSION);
+
+        request.onupgradeneeded = () => {
+          const database = request.result;
+
+          if (!database.objectStoreNames.contains("ordenes")) {
+            database.createObjectStore("ordenes", { keyPath: "id" });
+          }
+
+          if (!database.objectStoreNames.contains("materiales")) {
+            database.createObjectStore("materiales", { keyPath: "id" });
+          }
+
+          if (!database.objectStoreNames.contains("clientes")) {
+            database.createObjectStore("clientes", { keyPath: "id" });
+          }
+        };
+
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+    const contarDatos = (storeName) => {
+      return new Promise((resolve, reject) => {
+        const tx = dbNueva.transaction(storeName, "readonly");
+        const store = tx.objectStore(storeName);
+        const request = store.count();
+
+        request.onsuccess = () => resolve(request.result || 0);
+        request.onerror = () => reject(request.error);
+      });
+    };
+
+    const cantidadesNuevas = await Promise.all([
+      contarDatos("ordenes"),
+      contarDatos("materiales"),
+      contarDatos("clientes")
+    ]);
+
+    const nuevaBaseTieneDatos =
+      cantidadesNuevas[0] > 0 ||
+      cantidadesNuevas[1] > 0 ||
+      cantidadesNuevas[2] > 0;
+
+    if (nuevaBaseTieneDatos) {
+      dbNueva.close();
+      console.log("La base logitec-industrial ya contiene datos. Migración omitida.");
+      return;
+    }
+      const tx = dbNueva.transaction(
+        ["ordenes", "materiales", "clientes"],
+        "readwrite"
+      );
+
+      ordenesAnteriores.forEach(item => {
+        tx.objectStore("ordenes").put(item);
+      });
+
+      materialesAnteriores.forEach(item => {
+        tx.objectStore("materiales").put(item);
+      });
+
+      clientesAnteriores.forEach(item => {
+        tx.objectStore("clientes").put(item);
+      });
+
+      await new Promise((resolve, reject) => {
+        tx.oncomplete = resolve;
+        tx.onerror = () => reject(tx.error);
+        tx.onabort = () => reject(tx.error);
+      });
+
+      dbNueva.close();
+
+      console.log("Migración completada correctamente.");
+    }
+
+    await migrarBaseAnterior();
+
+  const DB_NAME = "logitec-industrial";
     const DB_VERSION = 2;
 
     function abrirBaseLocal() {
