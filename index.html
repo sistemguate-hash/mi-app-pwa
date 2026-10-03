@@ -1425,7 +1425,7 @@ async function exportarPDF(id, btn) {
     const doc = new jsPDF();
     let y = 20;
     doc.setFont("helvetica", "bold"); doc.setFontSize(16);
-    doc.text("Orden de trabajo — Taller de Rebobinado", 14, y); y += 8;
+    doc.text("Orden de trabajo — " + obtenerNombreTaller(), 14, y); y += 8;
     doc.setFontSize(11); doc.setFont("helvetica", "normal");
     doc.text("ORD-" + ordenNumero(o.id) + "   ·   Ingreso: " + fmtFecha(o.fechaIngreso) + "   ·   Estado: " + o.estado, 14, y); y += 10;
     doc.setDrawColor(180); doc.line(14, y, 196, y); y += 8;
