@@ -45,6 +45,35 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
+  // Para la página principal usamos RED PRIMERO.
+  // Así las actualizaciones de la aplicación aparecen normalmente.
+  if (event.request.mode === "navigate") {
+    event.respondWith(
+      fetch(event.request)
+        .then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            const responseToCache = networkResponse.clone();
+
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(event.request, responseToCache);
+              cache.put("./index.html", networkResponse.clone());
+            });
+          }
+
+          return networkResponse;
+        })
+        .catch(() => {
+          return caches.match(event.request)
+            .then((cachedResponse) => {
+              return cachedResponse || caches.match("./index.html");
+            });
+        })
+    );
+
+    return;
+  }
+
+  // Para los demás recursos mantenemos la estrategia de caché.
   event.respondWith(
     caches.match(event.request)
       .then((cachedResponse) => {
@@ -68,19 +97,13 @@ self.addEventListener("fetch", (event) => {
             }
 
             return networkResponse;
-          })
-          .catch(() => {
-            // Si estamos sin conexión y es una navegación,
-            // mostramos la aplicación almacenada.
-            if (event.request.mode === "navigate") {
-              return caches.match("./index.html");
-            }
-
-            return new Response("", {
-              status: 503,
-              statusText: "Sin conexión"
-            });
           });
+      })
+      .catch(() => {
+        return new Response("", {
+          status: 503,
+          statusText: "Sin conexión"
+        });
       })
   );
 });
