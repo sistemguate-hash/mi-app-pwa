@@ -448,7 +448,28 @@ select {
         placeholder="Ej. Taller de Rebobinado"
       >
     </div>
+<div class="field">
+  <label>Tipo de taller</label>
 
+  <select id="configPerfilTaller">
+    <option value="motores-electricos">Motores eléctricos</option>
+    <option value="automotriz">Taller automotriz</option>
+    <option value="herreria">Herrería</option>
+    <option value="torno-industrial">Torno industrial</option>
+    <option value="carpinteria">Carpintería</option>
+  </select>
+
+  <div
+    style="
+      margin-top:6px;
+      font-size:12px;
+      color:var(--text-dim);
+      line-height:1.4;
+    "
+  >
+    Define los campos técnicos que utilizará este tipo de taller.
+  </div>
+</div>
     <div class="field">
       <label>Símbolo de moneda</label>
       <input
@@ -529,7 +550,7 @@ function renderEtiquetasMoneda() {
 function abrirConfiguracion() {
   const nombre = document.getElementById("configNombreTaller");
   const moneda = document.getElementById("configMoneda");
-
+const perfil = document.getElementById("configPerfilTaller");
   if (nombre) {
     nombre.value = obtenerNombreTaller();
   }
@@ -537,7 +558,11 @@ function abrirConfiguracion() {
   if (moneda) {
     moneda.value = localStorage.getItem("monedaSimbolo") || "Q";
   }
-
+if (perfil) {
+  perfil.value =
+    localStorage.getItem("perfilTaller") ||
+    "motores-electricos";
+}
   document
     .getElementById("configuracionOverlay")
     .classList.add("open");
@@ -559,7 +584,9 @@ function guardarConfiguracion() {
     .getElementById("configMoneda")
     .value
     .trim();
-
+const perfil = document
+  .getElementById("configPerfilTaller")
+  .value;
   localStorage.setItem(
     "nombreTaller",
     nombre || "Taller de Rebobinado"
@@ -569,7 +596,10 @@ function guardarConfiguracion() {
     "monedaSimbolo",
     moneda || "Q"
   );
-
+localStorage.setItem(
+  "perfilTaller",
+  perfil || "motores-electricos"
+);
 render();
 cerrarConfiguracion();
 }
