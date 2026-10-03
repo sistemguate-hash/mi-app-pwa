@@ -240,7 +240,7 @@ select {
 <body>
 <div class="wrap">
   <header>
-    <div class="title-row"><h1>Taller de Rebobinado</h1></div>
+    <div class="title-row"><h1 id="nombreTaller">Taller de Rebobinado</h1></div>
     <p class="sub">Ingresos y seguimiento de motores</p>
   </header>
 
@@ -250,6 +250,7 @@ select {
     <input type="search" id="search" placeholder="Buscar cliente o motor…">
     <button type="button" class="btn-sm" id="btnClientes">👤 Clientes</button>
     <button type="button" class="btn-sm" id="btnCatalogo" style="white-space:nowrap;">📦 Materiales</button>
+    <button type="button" class="btn-sm" id="btnConfiguracion">⚙️ Configuración</button>
   </div>
   <div class="pills" id="pills"></div>
 
@@ -427,7 +428,51 @@ select {
     </div>
   </div>
 </div>
+<!-- CONFIGURACIÓN DEL TALLER -->
+<div class="overlay" id="configuracionOverlay">
+  <div class="sheet">
+    <h2>Configuración</h2>
+
+    <div class="field">
+      <label>Nombre del taller</label>
+      <input
+        id="configNombreTaller"
+        type="text"
+        placeholder="Ej. Taller de Rebobinado"
+      >
+    </div>
+
+    <div class="field">
+      <label>Símbolo de moneda</label>
+      <input
+        id="configMoneda"
+        type="text"
+        placeholder="Ej. Q"
+        maxlength="5"
+      >
+    </div>
+
+    <div class="sheet-actions" style="margin-top:14px;">
+      <button
+        type="button"
+        class="btn-cancel"
+        id="btnCancelarConfiguracion"
+        style="flex:1;">
+        Cancelar
+      </button>
+
+      <button
+        type="button"
+        class="btn-new"
+        id="btnGuardarConfiguracion"
+        style="flex:1;">
+        Guardar
+      </button>
+    </div>
+  </div>
+</div>
 <script>
+ 
 const ESTADOS = ["Recibido", "Diagnóstico", "Rebobinado", "Listo", "Entregado"];
 let db = null;
 let downloadsCap = null;
@@ -443,7 +488,71 @@ let clientes = [];
 let catEditId = null;
 let itemsActuales = [];
 
-function fmtQ(n) { n = Number(n) || 0; return "Q" + n.toLocaleString("es-GT", {minimumFractionDigits: 0}); }
+function fmtQ(n) {
+  n = Number(n) || 0;
+  const moneda = localStorage.getItem("monedaSimbolo") || "Q";
+  return moneda + n.toLocaleString("es-GT", {
+    minimumFractionDigits: 0
+  });
+}
+function obtenerNombreTaller() {
+  return localStorage.getItem("nombreTaller") || "Taller de Rebobinado";
+}
+
+function renderNombreTaller() {
+  const el = document.getElementById("nombreTaller");
+  if (el) {
+    el.textContent = obtenerNombreTaller();
+  }
+}
+
+function abrirConfiguracion() {
+  const nombre = document.getElementById("configNombreTaller");
+  const moneda = document.getElementById("configMoneda");
+
+  if (nombre) {
+    nombre.value = obtenerNombreTaller();
+  }
+
+  if (moneda) {
+    moneda.value = localStorage.getItem("monedaSimbolo") || "Q";
+  }
+
+  document
+    .getElementById("configuracionOverlay")
+    .classList.add("open");
+}
+
+function cerrarConfiguracion() {
+  document
+    .getElementById("configuracionOverlay")
+    .classList.remove("open");
+}
+
+function guardarConfiguracion() {
+  const nombre = document
+    .getElementById("configNombreTaller")
+    .value
+    .trim();
+
+  const moneda = document
+    .getElementById("configMoneda")
+    .value
+    .trim();
+
+  localStorage.setItem(
+    "nombreTaller",
+    nombre || "Taller de Rebobinado"
+  );
+
+  localStorage.setItem(
+    "monedaSimbolo",
+    moneda || "Q"
+  );
+
+  renderNombreTaller();
+  cerrarConfiguracion();
+}
 function fmtFecha(iso) {
   const d = new Date(iso);
   return d.toLocaleDateString("es-GT", { day: "2-digit", month: "short" });
@@ -1452,6 +1561,9 @@ on("f-foto-input", "onchange", subirFotos);
 on("f-archivo-input", "onchange", subirFotos);
 on("btnCancel", "onclick", cerrarSheet);
 on("btnSave", "onclick", guardar);
+on("btnConfiguracion", "onclick", abrirConfiguracion);
+on("btnCancelarConfiguracion", "onclick", cerrarConfiguracion);
+on("btnGuardarConfiguracion", "onclick", guardarConfiguracion);
 on("search", "oninput", (e) => { busqueda = e.target.value; render(); });
 on("btnCatalogo", "onclick", abrirCatalogo);
 on("btnClientes", "onclick", () => {
