@@ -2172,6 +2172,13 @@ function renderClientesList() {
           </div>
         </div>
 
+       <button
+  type="button"
+  class="btn-sm btn-primary btn-ficha-cliente"
+  data-id="${escapeHtml(c.id)}">
+  Abrir ficha
+</button>
+
         <button
           type="button"
           class="btn-sm btn-edit btn-edit-cliente"
@@ -2191,6 +2198,9 @@ function renderClientesList() {
   el.querySelectorAll(".btn-edit-cliente").forEach(btn => {
     btn.onclick = () => editarCliente(btn.dataset.id);
   });
+  el.querySelectorAll(".btn-ficha-cliente").forEach(btn => {
+  btn.onclick = () => abrirFichaCliente(btn.dataset.id);
+});
   el.querySelectorAll(".btn-del-cliente").forEach(btn => {
   btn.onclick = () => eliminarCliente(btn.dataset.id);
 });
