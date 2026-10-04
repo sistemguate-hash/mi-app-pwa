@@ -622,7 +622,7 @@ select {
 </div>
 <script>
  
-const ESTADOS = ["Recibido", "Diagnóstico", "Rebobinado", "Listo", "Entregado"];
+const ESTADOS = ["Recibido", "Diagnóstico", "En proceso", "Listo", "Entregado"];
 let db = null;
 let downloadsCap = null;
 let ordenes = [];
@@ -1373,16 +1373,31 @@ function cardHtml(o) {
         }
       </div>
 
-      <!-- BOTÓN ABRIR ORDEN -->
-      <div class="detail-actions" style="margin-top:12px;">
-        <button
-          type="button"
-          class="btn-primary"
-          style="width:100%;"
-          onclick="abrirFichaOrden('${o.id}')">
-          Abrir Orden
-        </button>
-      </div>
+     <!-- ESTADO DE LA ORDEN -->
+<div class="row2" style="margin-top:12px;">
+  <strong>Estado:</strong>
+  <select
+    class="sel-estado"
+    style="margin-left:8px; padding:6px 10px; border-radius:8px;"
+  >
+    ${ESTADOS.map(e =>
+      `<option value="${escapeHtml(e)}" ${o.estado === e ? "selected" : ""}>
+        ${escapeHtml(e)}
+      </option>`
+    ).join("")}
+  </select>
+</div>
+
+<!-- BOTÓN ABRIR ORDEN -->
+<div class="detail-actions" style="margin-top:12px;">
+  <button
+    type="button"
+    class="btn-primary"
+    style="width:100%;"
+    onclick="abrirFichaOrden('${o.id}')">
+    Abrir Orden
+  </button>
+</div>
 
     </div>
   `;
