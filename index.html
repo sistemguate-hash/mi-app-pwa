@@ -2112,6 +2112,31 @@ function abrirFichaOrden(id) {
   document
     .getElementById("ordenFichaOverlay")
     .classList.add("open");
+    // BOTONES DE LA FICHA DE LA ORDEN
+document.getElementById("btnOrdenEditar").onclick = () => {
+  document
+    .getElementById("ordenFichaOverlay")
+    .classList.remove("open");
+
+  abrirSheetEditar(id);
+};
+
+document.getElementById("btnOrdenPDF").onclick = () => {
+  exportarPDF(
+    id,
+    document.getElementById("btnOrdenPDF")
+  );
+};
+
+document.getElementById("btnOrdenEliminar").onclick = () => {
+  borrar(id);
+};
+
+document.getElementById("btnOrdenCerrar").onclick = () => {
+  document
+    .getElementById("ordenFichaOverlay")
+    .classList.remove("open");
+};
 }
 function renderClientesList() {
   const el = document.getElementById("clientesList");
