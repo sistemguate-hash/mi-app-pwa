@@ -2165,9 +2165,28 @@ async function exportarPDF(id, btn) {
   "Potencia:",
   (o.potencia || "") + " " + (o.unidadPotencia || "HP")
 );
-    campo("Voltaje:", o.voltaje);
-    campo("Marca:", o.marca);
-    y += 2; doc.line(14, y, 196, y); y += 8;
+campo("Voltaje:", o.voltaje);
+campo("Marca:", o.marca);
+
+doc.setFont("helvetica", "bold");
+doc.text("Ficha técnica del motor:", 14, y);
+y += 7;
+
+doc.setFont("helvetica", "normal");
+
+if (o.modelo) campo("Modelo:", o.modelo);
+if (o.numeroSerie) campo("Número de serie:", o.numeroSerie);
+if (o.frecuencia) campo("Frecuencia:", o.frecuencia);
+if (o.fases) campo("Fases:", o.fases);
+if (o.corriente) campo("Corriente:", o.corriente + " A");
+if (o.factorPotencia) campo("Factor de potencia:", o.factorPotencia);
+if (o.rpm) campo("RPM:", o.rpm);
+if (o.claseAislamiento) campo("Clase de aislamiento:", o.claseAislamiento);
+if (o.gradoProteccion) campo("Grado de protección:", o.gradoProteccion);
+
+y += 2;
+doc.line(14, y, 196, y);
+y += 8;
     doc.setFont("helvetica", "bold"); doc.text("Falla reportada:", 14, y); y += 7;
     doc.setFont("helvetica", "normal");
     doc.text(doc.splitTextToSize(o.falla || "—", 180), 14, y); y += 16;
