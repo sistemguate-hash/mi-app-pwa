@@ -1295,6 +1295,23 @@ document.getElementById("lightbox").onclick = () => document.getElementById("lig
 
 function cardHtml(o) {
   const abierto = openId === o.id;
+
+  const fichaTecnica1 = [
+    o.modelo ? `Modelo: ${escapeHtml(o.modelo)}` : "",
+    o.numeroSerie ? `Serie: ${escapeHtml(o.numeroSerie)}` : "",
+    o.voltaje ? `Voltaje: ${escapeHtml(o.voltaje)}` : "",
+    o.frecuencia ? `Frecuencia: ${escapeHtml(o.frecuencia)}` : "",
+    o.fases ? `Fases: ${escapeHtml(o.fases)}` : ""
+  ].filter(Boolean).join(" · ");
+
+  const fichaTecnica2 = [
+    o.corriente ? `Corriente: ${escapeHtml(o.corriente)} A` : "",
+    o.factorPotencia ? `FP: ${escapeHtml(o.factorPotencia)}` : "",
+    o.rpm ? `RPM: ${escapeHtml(o.rpm)}` : "",
+    o.claseAislamiento ? `Aislamiento: ${escapeHtml(o.claseAislamiento)}` : "",
+    o.gradoProteccion ? `IP: ${escapeHtml(o.gradoProteccion)}` : ""
+  ].filter(Boolean).join(" · ");
+
   return `
   <div class="card" id="card-${o.id}">
     <div class="card-top">
@@ -1305,6 +1322,15 @@ function cardHtml(o) {
 ${o.falla ? `<div class="falla">${escapeHtml(o.falla)}</div>` : ""}
     </div>
   </div>
+  ${fichaTecnica1 ? `
+<div class="row2" style="color:var(--text-dim); font-size:12px; line-height:1.35;">
+  ${fichaTecnica1}
+</div>` : ""}
+
+${fichaTecnica2 ? `
+<div class="row2" style="color:var(--text-dim); font-size:12px; line-height:1.35;">
+  ${fichaTecnica2}
+</div>` : ""}
   <div class="card-bottom">
       <span class="badge badge-${o.estado}">${o.estado}</span>
       <span class="total">${fmtQ(o.total)}</span>
