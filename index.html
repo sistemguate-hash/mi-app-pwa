@@ -313,6 +313,91 @@ select {
     </select>
   </div>
 </div>
+<div class="grid2">
+  <div class="field">
+    <label>Modelo</label>
+    <input id="f-modelo" placeholder="Ej. WEG W22">
+  </div>
+
+  <div class="field">
+    <label>Número de serie</label>
+    <input id="f-numero-serie" placeholder="Ej. SN123456">
+  </div>
+</div>
+
+<div class="grid2">
+  <div class="field">
+    <label>Frecuencia</label>
+    <select id="f-frecuencia">
+      <option value="">Seleccionar...</option>
+      <option value="50 Hz">50 Hz</option>
+      <option value="60 Hz">60 Hz</option>
+      <option value="Otra">Otra</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label>Fases</label>
+    <select id="f-fases">
+      <option value="">Seleccionar...</option>
+      <option value="1">1</option>
+      <option value="3">3</option>
+      <option value="Otra">Otra</option>
+    </select>
+  </div>
+</div>
+
+<div class="grid2">
+  <div class="field">
+    <label>Corriente (A)</label>
+    <input id="f-corriente" type="number" step="0.01" placeholder="Ej. 12.5">
+  </div>
+
+  <div class="field">
+    <label>Factor de potencia</label>
+    <input id="f-factor-potencia" type="number" step="0.01" placeholder="Ej. 0.85">
+  </div>
+</div>
+
+<div class="grid2">
+  <div class="field">
+    <label>RPM</label>
+    <input id="f-rpm" type="number" step="1" placeholder="Ej. 1750">
+  </div>
+
+  <div class="field">
+    <label>Clase de aislamiento</label>
+    <select id="f-clase-aislamiento">
+      <option value="">Seleccionar...</option>
+      <option value="A">A</option>
+      <option value="B">B</option>
+      <option value="F">F</option>
+      <option value="H">H</option>
+      <option value="Otra">Otra</option>
+    </select>
+  </div>
+</div>
+
+<div class="grid2">
+  <div class="field">
+    <label>Grado de protección</label>
+    <select id="f-grado-proteccion">
+      <option value="">Seleccionar...</option>
+      <option value="IP20">IP20</option>
+      <option value="IP21">IP21</option>
+      <option value="IP23">IP23</option>
+      <option value="IP44">IP44</option>
+      <option value="IP54">IP54</option>
+      <option value="IP55">IP55</option>
+      <option value="IP65">IP65</option>
+      <option value="Otra">Otra</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label> </label>
+  </div>
+</div>
     </div>
     <div class="grid2">
       <div class="field"><label>Voltaje</label><input id="f-voltaje" placeholder="Ej. 220V"></div>
@@ -558,66 +643,143 @@ function renderEtiquetasMoneda() {
 
 const PERFILES_TALLER = {
 
-  "motores-electricos": {
-    nombre: "Motores eléctricos",
-
-    campos: [
-      {
-        id: "tipoMotor",
-        nombre: "Tipo de motor",
-        tipo: "select",
-        obligatorio: true,
+ "motores-electricos": {
+  nombre: "Motores eléctricos",
+  campos: [
+    {
+      id: "tipoMotor",
+      nombre: "Tipo de motor",
+      tipo: "select",
+      obligatorio: true,
       opciones: [
-  "Monofásico",
-  "Trifásico",
-  "Corriente continua (DC)",
-  "Motorreductor",
-  "Motor con freno",
-  "Bomba de agua",
-  "Motor Blower",
-  "Otro"
-]
-      },
-      {
-        id: "marca",
-        nombre: "Marca",
-        tipo: "text",
-        obligatorio: false
-      },
-      {
-        id: "potencia",
-        nombre: "Potencia",
-        tipo: "number",
-        obligatorio: false
-      },
-      {
-        id: "unidadPotencia",
-        nombre: "Unidad de potencia",
-        tipo: "select",
-        obligatorio: false,
-        opciones: ["HP", "kW"]
-      },
-      {
-        id: "voltaje",
-        nombre: "Voltaje",
-        tipo: "text",
-        obligatorio: false
-      },
-      {
-        id: "rpm",
-        nombre: "RPM",
-        tipo: "number",
-        obligatorio: false
-      },
-      {
-        id: "fases",
-        nombre: "Fases",
-        tipo: "select",
-        obligatorio: false,
-        opciones: ["1", "3", "Otra"]
-      }
-    ]
-  },
+        "Monofásico",
+        "Trifásico",
+        "Corriente continua (DC)",
+        "Motorreductor",
+        "Motor con freno",
+        "Bomba de agua",
+        "Motor Blower",
+        "Otro"
+      ]
+    },
+    {
+      id: "marca",
+      nombre: "Marca",
+      tipo: "text",
+      obligatorio: false
+    },
+    {
+      id: "modelo",
+      nombre: "Modelo",
+      tipo: "text",
+      obligatorio: false
+    },
+    {
+      id: "numeroSerie",
+      nombre: "Número de serie",
+      tipo: "text",
+      obligatorio: false
+    },
+    {
+      id: "potencia",
+      nombre: "Potencia",
+      tipo: "number",
+      obligatorio: false
+    },
+    {
+      id: "unidadPotencia",
+      nombre: "Unidad de potencia",
+      tipo: "select",
+      obligatorio: false,
+      opciones: ["HP", "kW"]
+    },
+    {
+      id: "voltaje",
+      nombre: "Voltaje",
+      tipo: "text",
+      obligatorio: false
+    },
+    {
+      id: "frecuencia",
+      nombre: "Frecuencia",
+      tipo: "select",
+      obligatorio: false,
+      opciones: ["50 Hz", "60 Hz", "Otra"]
+    },
+    {
+      id: "fases",
+      nombre: "Fases",
+      tipo: "select",
+      obligatorio: false,
+      opciones: ["1", "3", "Otra"]
+    },
+    {
+      id: "corriente",
+      nombre: "Corriente",
+      tipo: "number",
+      obligatorio: false
+    },
+    {
+      id: "factorPotencia",
+      nombre: "Factor de potencia",
+      tipo: "number",
+      obligatorio: false
+    },
+    {
+      id: "rpm",
+      nombre: "RPM",
+      tipo: "number",
+      obligatorio: false
+    },
+    {
+      id: "claseAislamiento",
+      nombre: "Clase de aislamiento",
+      tipo: "select",
+      obligatorio: false,
+      opciones: ["A", "B", "F", "H", "Otra"]
+    },
+    {
+      id: "gradoProteccion",
+      nombre: "Grado de protección",
+      tipo: "select",
+      obligatorio: false,
+      opciones: [
+        "IP20",
+        "IP21",
+        "IP23",
+        "IP44",
+        "IP54",
+        "IP55",
+        "IP65",
+        "Otra"
+      ]
+    },
+    {
+      id: "falla",
+      nombre: "Falla reportada",
+      tipo: "text",
+      obligatorio: false
+    },
+    {
+      id: "diagnostico",
+      nombre: "Diagnóstico técnico",
+      tipo: "text",
+      obligatorio: false
+    },
+    {
+      id: "trabajoRealizado",
+      nombre: "Trabajo realizado",
+      tipo: "text",
+      obligatorio: false
+    },
+    {
+      id: "observaciones",
+      nombre: "Observaciones",
+      tipo: "text",
+      obligatorio: false
+    }
+  ]
+},
 
   "automotriz": {
     nombre: "Taller automotriz",
@@ -1833,11 +1995,20 @@ function abrirSheetEditar(id) {
   document.getElementById("sheetTitle").textContent = "Editar ORD-" + ordenNumero(id);
   document.getElementById("f-telefono").value = o.telefono || "";
   document.getElementById("f-tipo").value = o.tipo || "";
-  document.getElementById("f-potencia").value = o.potencia || "";
-  document.getElementById("f-unidad-potencia").value = o.unidadPotencia || "HP";
-  document.getElementById("f-voltaje").value = o.voltaje || "";
-  document.getElementById("f-marca").value = o.marca || "";
-  document.getElementById("f-falla").value = o.falla || "";
+document.getElementById("f-potencia").value = o.potencia || "";
+document.getElementById("f-unidad-potencia").value = o.unidadPotencia || "HP";
+document.getElementById("f-modelo").value = o.modelo || "";
+document.getElementById("f-numero-serie").value = o.numeroSerie || "";
+document.getElementById("f-voltaje").value = o.voltaje || "";
+document.getElementById("f-frecuencia").value = o.frecuencia || "";
+document.getElementById("f-fases").value = o.fases || "";
+document.getElementById("f-corriente").value = o.corriente || "";
+document.getElementById("f-factor-potencia").value = o.factorPotencia || "";
+document.getElementById("f-rpm").value = o.rpm || "";
+document.getElementById("f-clase-aislamiento").value = o.claseAislamiento || "";
+document.getElementById("f-grado-proteccion").value = o.gradoProteccion || "";
+document.getElementById("f-marca").value = o.marca || "";
+document.getElementById("f-falla").value = o.falla || "";
   document.getElementById("f-horas").value = o.horas || "";
 document.getElementById("f-tarifa").value = o.tarifa || "";
 document.getElementById("f-margen").value = o.margen || "";
@@ -1882,12 +2053,21 @@ const cliente = clienteObj ? clienteObj.nombre : "";
       cliente,
       telefono: document.getElementById("f-telefono").value.trim(),
       nit: document.getElementById("f-nit").value.trim(),
-      tipo: document.getElementById("f-tipo").value,
-      potencia: document.getElementById("f-potencia").value.trim(),
-      unidadPotencia: document.getElementById("f-unidad-potencia").value,
-      voltaje: document.getElementById("f-voltaje").value.trim(),
-      marca: document.getElementById("f-marca").value.trim(),
-      falla: document.getElementById("f-falla").value.trim(),
+     tipo: document.getElementById("f-tipo").value,
+potencia: document.getElementById("f-potencia").value.trim(),
+unidadPotencia: document.getElementById("f-unidad-potencia").value,
+modelo: document.getElementById("f-modelo").value.trim(),
+numeroSerie: document.getElementById("f-numero-serie").value.trim(),
+voltaje: document.getElementById("f-voltaje").value.trim(),
+frecuencia: document.getElementById("f-frecuencia").value,
+fases: document.getElementById("f-fases").value,
+corriente: document.getElementById("f-corriente").value.trim(),
+factorPotencia: document.getElementById("f-factor-potencia").value.trim(),
+rpm: document.getElementById("f-rpm").value.trim(),
+claseAislamiento: document.getElementById("f-clase-aislamiento").value,
+gradoProteccion: document.getElementById("f-grado-proteccion").value,
+marca: document.getElementById("f-marca").value.trim(),
+falla: document.getElementById("f-falla").value.trim(),
       materiales: materialesTotal(),
       materialesItems: itemsActuales,
       horas: Number(document.getElementById("f-horas").value) || 0,
