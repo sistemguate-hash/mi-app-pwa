@@ -2281,19 +2281,31 @@ function abrirSheet() {
   document.getElementById("sheetTitle").textContent = "Nuevo ingreso";
 
   // Limpiar campos del formulario
-  [
+ [
   "cliente",
   "telefono",
   "nit",
   "potencia",
+  "unidad-potencia",
   "voltaje",
   "marca",
+  "modelo",
+  "numero-serie",
+  "frecuencia",
+  "fases",
+  "corriente",
+  "factor-potencia",
+  "rpm",
+  "clase-aislamiento",
+  "grado-proteccion",
   "falla",
   "notas"
 ].forEach(k => {
   const el = document.getElementById("f-" + k);
   if (el) el.value = "";
 });
+
+
 
 // Campos numéricos: todo nuevo ingreso inicia en cero
 document.getElementById("f-horas").value = 0;
