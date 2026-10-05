@@ -560,7 +560,7 @@ function renderCamposTecnicos() {
   }
 
  contenedor.innerHTML = perfil.campos
-  .filter(campo => !document.getElementById("f-" + campo.id))
+ 
   .map(campo => {
 
     const requerido = campo.obligatorio ? "required" : "";
@@ -727,12 +727,7 @@ const PERFILES_TALLER = {
         "Otra"
       ]
     },
-    {
-      id: "falla",
-      nombre: "Falla reportada",
-      tipo: "text",
-      obligatorio: false
-    },
+    
     {
       id: "diagnostico",
       nombre: "Diagnóstico técnico",
@@ -2238,6 +2233,51 @@ function agregarItemMaterial() {
   renderItemsMateriales();
   actualizarTotalPresupuesto();
 }
+function obtenerPerfilTallerActual() {
+  const perfilId =
+    localStorage.getItem("perfilTaller") ||
+    "motores-electricos";
+
+  return PERFILES_TALLER[perfilId] || null;
+}
+
+function obtenerValoresCamposTecnicos() {
+  const perfil = obtenerPerfilTallerActual();
+  const valores = {};
+
+  if (!perfil || !perfil.campos) return valores;
+
+  perfil.campos.forEach(campo => {
+    const el = document.getElementById("f-" + campo.id);
+    if (!el) return;
+
+    valores[campo.id] =
+      campo.tipo === "number"
+        ? el.value.trim()
+        : el.value;
+  });
+
+  return valores;
+}
+
+function cargarValoresCamposTecnicos(orden) {
+  const perfil = obtenerPerfilTallerActual();
+  if (!perfil || !perfil.campos) return;
+
+  perfil.campos.forEach(campo => {
+    const el = document.getElementById("f-" + campo.id);
+    if (!el) return;
+
+    const valor = orden[campo.id];
+
+    if (valor === undefined || valor === null) {
+      el.value = "";
+    } else {
+      el.value = valor;
+    }
+  });
+}
+
 function abrirSheet() {
 
   // NUEVO INGRESO: limpiar completamente el estado anterior
@@ -2277,17 +2317,26 @@ renderCamposTecnicos();
 
 
 // Campos numéricos: todo nuevo ingreso inicia en cero
-document.getElementById("f-horas").value = 0;
-document.getElementById("f-tarifa").value = 0;
-document.getElementById("f-margen").value = 0;
-document.getElementById("f-total").value = 0;
+const campoHoras = document.getElementById("f-horas");
+const campoTarifa = document.getElementById("f-tarifa");
+const campoMargen = document.getElementById("f-margen");
+const campoTotal = document.getElementById("f-total");
+
+console.log("f-horas:", campoHoras);
+console.log("f-tarifa:", campoTarifa);
+console.log("f-margen:", campoMargen);
+console.log("f-total:", campoTotal);
+
+if (campoHoras) campoHoras.value = 0;
+if (campoTarifa) campoTarifa.value = 0;
+if (campoMargen) campoMargen.value = 0;
+if (campoTotal) campoTotal.value = 0;
 
 // Recalcular indicadores desde cero
 actualizarManoObra();
 actualizarTotalPresupuesto();
 
-  // Tipo de motor inicia sin selección
-  document.getElementById("f-tipo").value = "";
+ 
 
   // Restablecer elementos visuales
   renderFotosRow();
@@ -2305,23 +2354,11 @@ function abrirSheetEditar(id) {
   fotosActuales = [...(o.fotos || [])];
   itemsActuales = [...(o.materialesItems || [])];
   document.getElementById("sheetTitle").textContent = "Editar ORD-" + ordenNumero(id);
-  // Generar campos técnicos antes de cargar sus valores
+// Generar campos técnicos según el perfil seleccionado
 renderCamposTecnicos();
-  document.getElementById("f-telefono").value = o.telefono || "";
-  document.getElementById("f-tipo").value = o.tipo || "";
-document.getElementById("f-potencia").value = o.potencia || "";
-document.getElementById("f-unidad-potencia").value = o.unidadPotencia || "HP";
-document.getElementById("f-modelo").value = o.modelo || "";
-document.getElementById("f-numero-serie").value = o.numeroSerie || "";
-document.getElementById("f-voltaje").value = o.voltaje || "";
-document.getElementById("f-frecuencia").value = o.frecuencia || "";
-document.getElementById("f-fases").value = o.fases || "";
-document.getElementById("f-corriente").value = o.corriente || "";
-document.getElementById("f-factor-potencia").value = o.factorPotencia || "";
-document.getElementById("f-rpm").value = o.rpm || "";
-document.getElementById("f-clase-aislamiento").value = o.claseAislamiento || "";
-document.getElementById("f-grado-proteccion").value = o.gradoProteccion || "";
-document.getElementById("f-marca").value = o.marca || "";
+
+document.getElementById("f-telefono").value = o.telefono || "";
+cargarValoresCamposTecnicos(o);
 document.getElementById("f-falla").value = o.falla || "";
   document.getElementById("f-horas").value = o.horas || "";
 document.getElementById("f-tarifa").value = o.tarifa || "";
@@ -2363,25 +2400,15 @@ const cliente = clienteObj ? clienteObj.nombre : "";
       document.getElementById("f-cliente").focus();
       return;
     }
+    
     const datos = {
-      cliente,
-      telefono: document.getElementById("f-telefono").value.trim(),
-      nit: document.getElementById("f-nit").value.trim(),
-     tipo: document.getElementById("f-tipo").value,
-potencia: document.getElementById("f-potencia").value.trim(),
-unidadPotencia: document.getElementById("f-unidad-potencia").value,
-modelo: document.getElementById("f-modelo").value.trim(),
-numeroSerie: document.getElementById("f-numero-serie").value.trim(),
-voltaje: document.getElementById("f-voltaje").value.trim(),
-frecuencia: document.getElementById("f-frecuencia").value,
-fases: document.getElementById("f-fases").value,
-corriente: document.getElementById("f-corriente").value.trim(),
-factorPotencia: document.getElementById("f-factor-potencia").value.trim(),
-rpm: document.getElementById("f-rpm").value.trim(),
-claseAislamiento: document.getElementById("f-clase-aislamiento").value,
-gradoProteccion: document.getElementById("f-grado-proteccion").value,
-marca: document.getElementById("f-marca").value.trim(),
-falla: document.getElementById("f-falla").value.trim(),
+  cliente,
+  telefono: document.getElementById("f-telefono").value.trim(),
+  nit: document.getElementById("f-nit").value.trim(),
+
+  ...obtenerValoresCamposTecnicos(),
+
+  falla: document.getElementById("f-falla").value.trim(),
       materiales: materialesTotal(),
       materialesItems: itemsActuales,
       horas: Number(document.getElementById("f-horas").value) || 0,
