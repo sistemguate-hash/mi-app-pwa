@@ -1268,7 +1268,43 @@ function abrirLightbox(url) {
 }
 document.getElementById("lightbox").onclick = () => document.getElementById("lightbox").classList.remove("open");
 
+function obtenerResumenEquipo(orden) {
+  const perfil = obtenerPerfilDeOrden(orden);
 
+  if (!perfil) {
+    return "Equipo";
+  }
+
+  const valores = (perfil.campos || [])
+    .map(campo => ({
+      nombre: campo.nombre,
+      valor: orden[campo.id]
+    }))
+    .filter(item =>
+      item.valor !== undefined &&
+      item.valor !== null &&
+      String(item.valor).trim() !== ""
+    );
+
+  const detalles = valores
+    .slice(0, 3)
+    .map(item => {
+      let valor = String(item.valor);
+
+      // Evitar repetir la unidad de potencia
+      if (item.nombre === "Potencia" && orden.unidadPotencia) {
+        valor += " " + orden.unidadPotencia;
+      }
+
+      return valor;
+    });
+
+  return perfil.nombre + (
+    detalles.length
+      ? " · " + detalles.join(" · ")
+      : ""
+  );
+}
 function cardHtml(o) {
   return `
     <div class="card" id="card-${o.id}">
@@ -1303,16 +1339,10 @@ function cardHtml(o) {
       </div>
 
       <!-- 3. EQUIPO -->
-      <div class="row2" style="margin-top:8px;">
-        <strong>Equipo:</strong>
-        ${escapeHtml(o.tipo || "Motor")}
-        ${
-          o.potencia
-            ? " · " + escapeHtml(o.potencia) + " " +
-              escapeHtml(o.unidadPotencia || "HP")
-            : ""
-        }
-      </div>
+     <div class="row2" style="margin-top:8px;">
+  <strong>Equipo:</strong>
+  ${escapeHtml(obtenerResumenEquipo(o))}
+</div>
 
      <!-- ESTADO DE LA ORDEN -->
 <div class="row2" style="margin-top:12px;">
