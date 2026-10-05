@@ -2429,6 +2429,8 @@ function abrirSheetEditar(id) {
   fotosActuales = [...(o.fotos || [])];
   itemsActuales = [...(o.materialesItems || [])];
   document.getElementById("sheetTitle").textContent = "Editar ORD-" + ordenNumero(id);
+  // Generar campos técnicos antes de cargar sus valores
+renderCamposTecnicos();
   document.getElementById("f-telefono").value = o.telefono || "";
   document.getElementById("f-tipo").value = o.tipo || "";
 document.getElementById("f-potencia").value = o.potencia || "";
