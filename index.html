@@ -1810,14 +1810,38 @@ function abrirFichaCliente(clienteId) {
     .getElementById("clienteFichaOverlay")
     .classList.add("open");
 }
+function obtenerPerfilDeOrden(orden) {
+  const perfilId =
+    orden?.perfilTaller ||
+    localStorage.getItem("perfilTaller") ||
+    "motores-electricos";
 
+  return PERFILES_TALLER[perfilId] || PERFILES_TALLER["motores-electricos"];
+}
 function abrirFichaOrden(id) {
   const orden = ordenes.find(o => o.id === id);
   if (!orden) return;
 
   const contenido = document.getElementById("ordenFichaContenido");
   if (!contenido) return;
+const perfilOrden = obtenerPerfilDeOrden(orden);
 
+const camposTecnicosHtml = perfilOrden.campos
+  .map(campo => {
+    const valor = orden[campo.id];
+
+    if (valor === undefined || valor === null || valor === "") {
+      return "";
+    }
+
+    return `
+      <div class="cat-row">
+        <strong>${escapeHtml(campo.nombre)}</strong>
+        <div>${escapeHtml(String(valor))}</div>
+      </div>
+    `;
+  })
+  .join("");
   const materialesHtml =
     orden.materialesItems && orden.materialesItems.length
       ? orden.materialesItems.map(item => `
@@ -1897,87 +1921,15 @@ function abrirFichaOrden(id) {
       <div>${escapeHtml(orden.telefono || "Sin teléfono")}</div>
     </div>
 
-    <div style="
-      margin:16px 0 10px;
-      font-size:16px;
-      font-weight:700;
-    ">
-      Datos del motor
-    </div>
+   <div style="
+  margin:16px 0 10px;
+  font-size:16px;
+  font-weight:700;
+">
+  ${escapeHtml(perfilOrden.nombre)}
+</div>
 
-    <div class="cat-row">
-      <strong>Tipo de motor</strong>
-      <div>${escapeHtml(orden.tipo || "—")}</div>
-    </div>
-
-    <div class="cat-row">
-      <strong>Potencia</strong>
-      <div>
-        ${orden.potencia
-          ? escapeHtml(orden.potencia) + " " + escapeHtml(orden.unidadPotencia || "HP")
-          : "—"}
-      </div>
-    </div>
-
-    <div class="cat-row">
-      <strong>Modelo</strong>
-      <div>${escapeHtml(orden.modelo || "—")}</div>
-    </div>
-
-    <div class="cat-row">
-      <strong>Número de serie</strong>
-      <div>${escapeHtml(orden.numeroSerie || "—")}</div>
-    </div>
-
-    <div class="cat-row">
-      <strong>Voltaje</strong>
-      <div>${escapeHtml(orden.voltaje || "—")}</div>
-    </div>
-
-    <div class="cat-row">
-      <strong>Frecuencia</strong>
-      <div>${escapeHtml(orden.frecuencia || "—")}</div>
-    </div>
-
-    <div class="cat-row">
-      <strong>Fases</strong>
-      <div>${escapeHtml(orden.fases || "—")}</div>
-    </div>
-
-    <div class="cat-row">
-      <strong>Corriente</strong>
-      <div>
-        ${orden.corriente
-          ? escapeHtml(orden.corriente) + " A"
-          : "—"}
-      </div>
-    </div>
-
-    <div class="cat-row">
-      <strong>Factor de potencia</strong>
-      <div>${escapeHtml(orden.factorPotencia || "—")}</div>
-    </div>
-
-    <div class="cat-row">
-      <strong>RPM</strong>
-      <div>${escapeHtml(orden.rpm || "—")}</div>
-    </div>
-
-    <div class="cat-row">
-      <strong>Clase de aislamiento</strong>
-      <div>${escapeHtml(orden.claseAislamiento || "—")}</div>
-    </div>
-
-    <div class="cat-row">
-      <strong>Grado de protección</strong>
-      <div>${escapeHtml(orden.gradoProteccion || "—")}</div>
-    </div>
-
-    <div class="cat-row">
-      <strong>Marca</strong>
-      <div>${escapeHtml(orden.marca || "—")}</div>
-    </div>
-
+${camposTecnicosHtml}
     <div style="
       margin:16px 0 10px;
       font-size:16px;
@@ -2402,7 +2354,9 @@ const cliente = clienteObj ? clienteObj.nombre : "";
   cliente,
   telefono: document.getElementById("f-telefono").value.trim(),
   nit: document.getElementById("f-nit").value.trim(),
-
+perfilTaller:
+  localStorage.getItem("perfilTaller") ||
+  "motores-electricos",
   ...obtenerValoresCamposTecnicos(),
 
   falla: document.getElementById("f-falla").value.trim(),
