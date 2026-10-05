@@ -278,131 +278,7 @@ select {
     <input id="f-nit" placeholder="Ej. 1234567-8">
   </div>
 </div>
-    <div class="grid2">
-      <div class="field"><label>Tipo de motor</label>
-    <select id="f-tipo">
-  <option value="">Seleccionar tipo de motor...</option>
-  <option value="Monofásico">Monofásico</option>
-<option value="Trifásico">Trifásico</option>
-<option value="Corriente continua (DC)">Corriente continua (DC)</option>
-<option value="Motorreductor">Motorreductor</option>
-<option value="Motor con freno">Motor con freno</option>
-<option value="Bomba de agua">Bomba de agua</option>
-<option value="Motor Blower">Motor Blower</option>
-<option value="Otro">Otro</option>
-</select>
-      </div>
-<div class="field">
-  <label>Potencia</label>
-  <div class="row2" style="gap:8px;">
-    <input
-      id="f-potencia"
-      type="number"
-      inputmode="decimal"
-      placeholder="Ej. 5"
-      step="0.01"
-      style="flex:1;"
-    >
-
-    <select
-      id="f-unidad-potencia"
-      style="width:90px; flex:none;"
-    >
-      <option value="HP">HP</option>
-      <option value="kW">kW</option>
-    </select>
-  </div>
-</div>
-<div class="grid2">
-  <div class="field">
-    <label>Modelo</label>
-    <input id="f-modelo" placeholder="Ej. WEG W22">
-  </div>
-
-  <div class="field">
-    <label>Número de serie</label>
-    <input id="f-numero-serie" placeholder="Ej. SN123456">
-  </div>
-</div>
-
-<div class="grid2">
-  <div class="field">
-    <label>Frecuencia</label>
-    <select id="f-frecuencia">
-      <option value="">Seleccionar...</option>
-      <option value="50 Hz">50 Hz</option>
-      <option value="60 Hz">60 Hz</option>
-      <option value="Otra">Otra</option>
-    </select>
-  </div>
-
-  <div class="field">
-    <label>Fases</label>
-    <select id="f-fases">
-      <option value="">Seleccionar...</option>
-      <option value="1">1</option>
-      <option value="3">3</option>
-      <option value="Otra">Otra</option>
-    </select>
-  </div>
-</div>
-
-<div class="grid2">
-  <div class="field">
-    <label>Corriente (A)</label>
-    <input id="f-corriente" type="number" step="0.01" placeholder="Ej. 12.5">
-  </div>
-
-  <div class="field">
-    <label>Factor de potencia</label>
-    <input id="f-factor-potencia" type="number" step="0.01" placeholder="Ej. 0.85">
-  </div>
-</div>
-
-<div class="grid2">
-  <div class="field">
-    <label>RPM</label>
-    <input id="f-rpm" type="number" step="1" placeholder="Ej. 1750">
-  </div>
-
-  <div class="field">
-    <label>Clase de aislamiento</label>
-    <select id="f-clase-aislamiento">
-      <option value="">Seleccionar...</option>
-      <option value="A">A</option>
-      <option value="B">B</option>
-      <option value="F">F</option>
-      <option value="H">H</option>
-      <option value="Otra">Otra</option>
-    </select>
-  </div>
-</div>
-
-<div class="grid2">
-  <div class="field">
-    <label>Grado de protección</label>
-    <select id="f-grado-proteccion">
-      <option value="">Seleccionar...</option>
-      <option value="IP20">IP20</option>
-      <option value="IP21">IP21</option>
-      <option value="IP23">IP23</option>
-      <option value="IP44">IP44</option>
-      <option value="IP54">IP54</option>
-      <option value="IP55">IP55</option>
-      <option value="IP65">IP65</option>
-      <option value="Otra">Otra</option>
-    </select>
-  </div>
-
-  <div class="field">
-    <label> </label>
-  </div>
-</div>
-    </div>
-    <div class="grid2">
-      <div class="field"><label>Voltaje</label><input id="f-voltaje" placeholder="Ej. 220V"></div>
-      <div class="field"><label>Marca</label><input id="f-marca" placeholder="Ej. WEG"></div>
-    </div>
+   
     <div id="camposTecnicos"></div>
     <div class="field"><label>Falla reportada</label><textarea id="f-falla" placeholder="Descripción del problema"></textarea></div>
     <div class="field">
@@ -886,7 +762,7 @@ const PERFILES_TALLER = {
         id: "tipoVehiculo",
         nombre: "Tipo de vehículo",
         tipo: "select",
-        obligatorio: true,
+        obligatorio: false,
         opciones: [
           "Sedán",
           "Pickup",
@@ -900,19 +776,19 @@ const PERFILES_TALLER = {
         id: "marca",
         nombre: "Marca",
         tipo: "text",
-        obligatorio: true
+        obligatorio: false
       },
       {
         id: "modelo",
         nombre: "Modelo",
         tipo: "text",
-        obligatorio: true
+        obligatorio: false
       },
       {
         id: "anio",
         nombre: "Año",
         tipo: "number",
-        obligatorio: true
+        obligatorio: false
       },
       {
         id: "placa",
