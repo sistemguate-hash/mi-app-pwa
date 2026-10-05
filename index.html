@@ -1275,6 +1275,55 @@ function obtenerResumenEquipo(orden) {
     return "Equipo";
   }
 
+  // Identificar el perfil real de la orden,
+  // incluso si es una orden antigua sin perfilTaller
+  const perfilId = Object.keys(PERFILES_TALLER).find(
+    id => PERFILES_TALLER[id] === perfil
+  );
+
+  // MOTORES ELÉCTRICOS
+  // Mostrar: Marca · Potencia + Unidad
+  if (
+  perfilId === "motores-electricos" ||
+  perfil.nombre === "Motores eléctricos"
+) {
+
+    const marca = orden.marca
+      ? String(orden.marca).trim()
+      : "";
+
+    const potencia = orden.potencia
+      ? String(orden.potencia).trim()
+      : "";
+
+    const unidadPotencia = orden.unidadPotencia
+      ? String(orden.unidadPotencia).trim()
+      : "";
+
+    const detalles = [];
+
+    if (marca) {
+      detalles.push(marca);
+    }
+
+    if (potencia) {
+      detalles.push(
+        unidadPotencia
+          ? `${potencia} ${unidadPotencia}`
+          : potencia
+      );
+    }
+
+    return perfil.nombre + (
+      detalles.length
+        ? " · " + detalles.join(" · ")
+        : ""
+    );
+  }
+
+  // OTROS PERFILES
+  // Mostrar los primeros 3 campos técnicos
+  // que tengan información
   const valores = (perfil.campos || [])
     .map(campo => ({
       nombre: campo.nombre,
@@ -1288,16 +1337,7 @@ function obtenerResumenEquipo(orden) {
 
   const detalles = valores
     .slice(0, 3)
-    .map(item => {
-      let valor = String(item.valor);
-
-      // Evitar repetir la unidad de potencia
-      if (item.nombre === "Potencia" && orden.unidadPotencia) {
-        valor += " " + orden.unidadPotencia;
-      }
-
-      return valor;
-    });
+    .map(item => String(item.valor));
 
   return perfil.nombre + (
     detalles.length
