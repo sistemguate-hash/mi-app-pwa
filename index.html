@@ -544,15 +544,18 @@ function renderEtiquetasMoneda() {
   if (total) total.textContent = moneda;
   if (precioMaterial) precioMaterial.textContent = moneda;
 }
-function renderCamposTecnicos() {
+
+
+ function renderCamposTecnicos(perfilId = null) {
   const contenedor = document.getElementById("camposTecnicos");
   if (!contenedor) return;
 
-  const perfilId =
+  const perfilSeleccionado =
+    perfilId ||
     localStorage.getItem("perfilTaller") ||
     "motores-electricos";
 
-  const perfil = PERFILES_TALLER[perfilId];
+  const perfil = PERFILES_TALLER[perfilSeleccionado];
 
   if (!perfil || !perfil.campos) {
     contenedor.innerHTML = "";
@@ -1811,12 +1814,61 @@ function abrirFichaCliente(clienteId) {
     .classList.add("open");
 }
 function obtenerPerfilDeOrden(orden) {
-  const perfilId =
-    orden?.perfilTaller ||
+  // 1. Las órdenes nuevas ya tienen el perfil guardado
+  if (orden?.perfilTaller && PERFILES_TALLER[orden.perfilTaller]) {
+    return PERFILES_TALLER[orden.perfilTaller];
+  }
+
+  // 2. Detectar órdenes antiguas de motores eléctricos
+  //    creadas antes de guardar perfilTaller
+  const camposMotor = [
+    "tipo",
+    "potencia",
+    "unidadPotencia",
+    "voltaje",
+    "frecuencia",
+    "fases",
+    "corriente",
+    "factorPotencia",
+    "rpm",
+    "claseAislamiento",
+    "gradoProteccion"
+  ];
+
+  const esMotor = camposMotor.some(campo =>
+  orden &&
+  Object.prototype.hasOwnProperty.call(orden, campo)
+);
+
+  if (esMotor) {
+    return PERFILES_TALLER["motores-electricos"];
+  }
+
+  // 3. Detectar órdenes antiguas de automotriz
+  const camposAutomotriz = [
+    "tipoVehiculo",
+    "placa",
+    "kilometraje",
+    "cilindraje",
+    "combustible",
+    "transmision"
+  ];
+
+  const esAutomotriz = camposAutomotriz.some(campo =>
+  orden &&
+  Object.prototype.hasOwnProperty.call(orden, campo)
+);
+  if (esAutomotriz) {
+    return PERFILES_TALLER["automotriz"];
+  }
+
+  // 4. Si no se puede determinar, usar el perfil actual
+  const perfilActual =
     localStorage.getItem("perfilTaller") ||
     "motores-electricos";
 
-  return PERFILES_TALLER[perfilId] || PERFILES_TALLER["motores-electricos"];
+  return PERFILES_TALLER[perfilActual] ||
+    PERFILES_TALLER["motores-electricos"];
 }
 function abrirFichaOrden(id) {
   const orden = ordenes.find(o => o.id === id);
@@ -2193,8 +2245,11 @@ function obtenerPerfilTallerActual() {
   return PERFILES_TALLER[perfilId] || null;
 }
 
-function obtenerValoresCamposTecnicos() {
-  const perfil = obtenerPerfilTallerActual();
+function obtenerValoresCamposTecnicos(orden = null) {
+  const perfil = orden
+    ? obtenerPerfilDeOrden(orden)
+    : obtenerPerfilTallerActual();
+
   const valores = {};
 
   if (!perfil || !perfil.campos) return valores;
@@ -2213,7 +2268,7 @@ function obtenerValoresCamposTecnicos() {
 }
 
 function cargarValoresCamposTecnicos(orden) {
-  const perfil = obtenerPerfilTallerActual();
+const perfil = obtenerPerfilDeOrden(orden);
   if (!perfil || !perfil.campos) return;
 
   perfil.campos.forEach(campo => {
@@ -2303,8 +2358,16 @@ function abrirSheetEditar(id) {
   fotosActuales = [...(o.fotos || [])];
   itemsActuales = [...(o.materialesItems || [])];
   document.getElementById("sheetTitle").textContent = "Editar ORD-" + ordenNumero(id);
-// Generar campos técnicos según el perfil seleccionado
-renderCamposTecnicos();
+// Generar campos técnicos según el perfil de esta orden
+const perfilOrden = obtenerPerfilDeOrden(o);
+
+const perfilIdOrden =
+  o.perfilTaller ||
+  Object.keys(PERFILES_TALLER).find(
+    id => PERFILES_TALLER[id] === perfilOrden
+  );
+
+renderCamposTecnicos(perfilIdOrden);
 
 document.getElementById("f-telefono").value = o.telefono || "";
 cargarValoresCamposTecnicos(o);
@@ -2350,25 +2413,44 @@ const cliente = clienteObj ? clienteObj.nombre : "";
       return;
     }
     
-    const datos = {
+ const ordenExistente = editId
+  ? ordenes.find(x => x.id === editId)
+  : null;
+
+const perfilParaGuardar = ordenExistente
+  ? (
+      ordenExistente.perfilTaller ||
+      (
+        Object.keys(PERFILES_TALLER).find(
+          id => PERFILES_TALLER[id] === obtenerPerfilDeOrden(ordenExistente)
+        )
+      ) ||
+      "motores-electricos"
+    )
+  : (
+      localStorage.getItem("perfilTaller") ||
+      "motores-electricos"
+    );
+
+const datos = {
   cliente,
   telefono: document.getElementById("f-telefono").value.trim(),
   nit: document.getElementById("f-nit").value.trim(),
-perfilTaller:
-  localStorage.getItem("perfilTaller") ||
-  "motores-electricos",
-  ...obtenerValoresCamposTecnicos(),
+
+  perfilTaller: perfilParaGuardar,
+
+  ...obtenerValoresCamposTecnicos(ordenExistente),
 
   falla: document.getElementById("f-falla").value.trim(),
-      materiales: materialesTotal(),
-      materialesItems: itemsActuales,
-      horas: Number(document.getElementById("f-horas").value) || 0,
-tarifa: Number(document.getElementById("f-tarifa").value) || 0,
-margen: Number(document.getElementById("f-margen").value) || 0,
-total: Number(document.getElementById("f-total").value) || 0,
-      notas: document.getElementById("f-notas").value.trim(),
-      fotos: fotosActuales
-    };
+  materiales: materialesTotal(),
+  materialesItems: itemsActuales,
+  horas: Number(document.getElementById("f-horas").value) || 0,
+  tarifa: Number(document.getElementById("f-tarifa").value) || 0,
+  margen: Number(document.getElementById("f-margen").value) || 0,
+  total: Number(document.getElementById("f-total").value) || 0,
+  notas: document.getElementById("f-notas").value.trim(),
+  fotos: fotosActuales
+};
 
     if (editId) {
       const idx = ordenes.findIndex(x => x.id === editId);
