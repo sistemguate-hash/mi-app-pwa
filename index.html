@@ -1862,13 +1862,10 @@ function obtenerPerfilDeOrden(orden) {
     return PERFILES_TALLER["automotriz"];
   }
 
-  // 4. Si no se puede determinar, usar el perfil actual
-  const perfilActual =
-    localStorage.getItem("perfilTaller") ||
-    "motores-electricos";
-
-  return PERFILES_TALLER[perfilActual] ||
-    PERFILES_TALLER["motores-electricos"];
+  // 4. Las órdenes antiguas fueron creadas originalmente
+//    cuando el sistema trabajaba únicamente con motores eléctricos.
+//    Por seguridad, si no tienen perfilTaller, se consideran motores.
+return PERFILES_TALLER["motores-electricos"];
 }
 function abrirFichaOrden(id) {
   const orden = ordenes.find(o => o.id === id);
