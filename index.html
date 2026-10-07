@@ -866,7 +866,7 @@ const PERFILES_TALLER = {
         id: "tipoTrabajo",
         nombre: "Tipo de trabajo",
         tipo: "select",
-        obligatorio: true,
+        obligatorio: false,
         opciones: [
           "Fabricación",
           "Reparación",
@@ -879,7 +879,7 @@ const PERFILES_TALLER = {
         id: "material",
         nombre: "Material",
         tipo: "select",
-        obligatorio: true,
+        obligatorio: false,
         opciones: [
           "Hierro",
           "Acero",
@@ -950,7 +950,7 @@ const PERFILES_TALLER = {
         id: "tipoTrabajo",
         nombre: "Tipo de trabajo",
         tipo: "select",
-        obligatorio: true,
+        obligatorio: false,
         opciones: [
           "Fabricación",
           "Reparación",
@@ -964,7 +964,7 @@ const PERFILES_TALLER = {
         id: "material",
         nombre: "Material",
         tipo: "select",
-        obligatorio: true,
+        obligatorio: false,
         opciones: [
           "Acero",
           "Acero inoxidable",
@@ -974,25 +974,35 @@ const PERFILES_TALLER = {
           "Otro"
         ]
       },
-      {
-        id: "diametro",
-        nombre: "Diámetro",
-        tipo: "number",
-        obligatorio: false,
-        unidad: "mm"
-      },
-      {
-        id: "longitud",
-        nombre: "Longitud",
-        tipo: "number",
-        obligatorio: false,
-        unidad: "mm"
-      },
+    {
+  id: "diametro",
+  nombre: "Diámetro",
+  tipo: "number",
+  obligatorio: false
+},
+{
+  id: "longitud",
+  nombre: "Longitud",
+  tipo: "number",
+  obligatorio: false
+},
+{
+  id: "unidadMedida",
+  nombre: "Unidad de medida",
+  tipo: "select",
+  obligatorio: false,
+  opciones: [
+    "mm",
+    "cm",
+    "in",
+    "m"
+  ]
+},
       {
         id: "cantidad",
         nombre: "Cantidad",
         tipo: "number",
-        obligatorio: true,
+        obligatorio: false,
         unidad: "unidades"
       },
       {
@@ -1008,12 +1018,11 @@ const PERFILES_TALLER = {
         obligatorio: false
       },
       {
-        id: "diametroInterior",
-        nombre: "Diámetro interior",
-        tipo: "number",
-        obligatorio: false,
-        unidad: "mm"
-      },
+  id: "diametroInterior",
+  nombre: "Diámetro interior",
+  tipo: "number",
+  obligatorio: false
+},
       {
         id: "acabado",
         nombre: "Acabado",
@@ -1031,7 +1040,7 @@ const PERFILES_TALLER = {
         id: "tipoTrabajo",
         nombre: "Tipo de trabajo",
         tipo: "select",
-        obligatorio: true,
+        obligatorio: false,
         opciones: [
           "Fabricación",
           "Reparación",
@@ -1044,7 +1053,7 @@ const PERFILES_TALLER = {
         id: "material",
         nombre: "Material",
         tipo: "select",
-        obligatorio: true,
+        obligatorio: false,
         opciones: [
           "Madera sólida",
           "MDF",
