@@ -1847,7 +1847,7 @@ function abrirFichaCliente(clienteId) {
         font-weight:400;
         margin-top:3px;
       ">
-  <button
+ <button
   type="button"
   style="
     border:0;
@@ -1857,7 +1857,11 @@ function abrirFichaCliente(clienteId) {
     font-size:11px;
     cursor:pointer;
   "
-  onclick="openId='${o.id}'; localStorage.setItem('ordenAbiertaId', openId); document.getElementById('clienteFichaOverlay').classList.remove('open'); render();"
+  onclick="
+    event.stopPropagation();
+    document.getElementById('clienteFichaOverlay').classList.remove('open');
+    abrirFichaOrden('${o.id}');
+  "
 >
   Ver orden →
 </button>
