@@ -1293,19 +1293,24 @@ function obtenerResumenEquipo(orden) {
     return "Equipo";
   }
 
-  // Identificar el perfil real de la orden,
-  // incluso si es una orden antigua sin perfilTaller
+  // Identificar el perfil real de la orden.
+  // Esto también funciona con órdenes antiguas
+  // que no tengan perfilTaller.
   const perfilId = Object.keys(PERFILES_TALLER).find(
     id => PERFILES_TALLER[id] === perfil
   );
 
-  // MOTORES ELÉCTRICOS
-  // Mostrar: Marca · Potencia + Unidad
-  if (
-  perfilId === "motores-electricos" ||
-  perfil.nombre === "Motores eléctricos"
-) {
+  let detalles = [];
 
+  // =====================================================
+  // MOTORES ELÉCTRICOS
+  // Marca · Potencia + unidad
+  // Ejemplo: Motores eléctricos · Baldor · 15 kW
+  // =====================================================
+  if (
+    perfilId === "motores-electricos" ||
+    perfil.nombre === "Motores eléctricos"
+  ) {
     const marca = orden.marca
       ? String(orden.marca).trim()
       : "";
@@ -1318,8 +1323,6 @@ function obtenerResumenEquipo(orden) {
       ? String(orden.unidadPotencia).trim()
       : "";
 
-    const detalles = [];
-
     if (marca) {
       detalles.push(marca);
     }
@@ -1331,31 +1334,212 @@ function obtenerResumenEquipo(orden) {
           : potencia
       );
     }
-
-    return perfil.nombre + (
-      detalles.length
-        ? " · " + detalles.join(" · ")
-        : ""
-    );
   }
 
-  // OTROS PERFILES
-  // Mostrar los primeros 3 campos técnicos
-  // que tengan información
-  const valores = (perfil.campos || [])
-    .map(campo => ({
-      nombre: campo.nombre,
-      valor: orden[campo.id]
-    }))
-    .filter(item =>
-      item.valor !== undefined &&
-      item.valor !== null &&
-      String(item.valor).trim() !== ""
-    );
+  // =====================================================
+  // AUTOMOTRIZ
+  // Tipo de vehículo · Marca · Modelo
+  // Ejemplo: Taller automotriz · SUV · Nissan · Sentra
+  // =====================================================
+  else if (perfilId === "automotriz") {
+    const tipoVehiculo = orden.tipoVehiculo
+      ? String(orden.tipoVehiculo).trim()
+      : "";
 
-  const detalles = valores
-    .slice(0, 3)
-    .map(item => String(item.valor));
+    const marca = orden.marca
+      ? String(orden.marca).trim()
+      : "";
+
+    const modelo = orden.modelo
+      ? String(orden.modelo).trim()
+      : "";
+
+    if (tipoVehiculo) detalles.push(tipoVehiculo);
+    if (marca) detalles.push(marca);
+    if (modelo) detalles.push(modelo);
+  }
+
+  // =====================================================
+  // HERRERÍA
+  // Trabajo · Material · dimensiones
+  // Ejemplo:
+  // Herrería · Instalación · Hierro · 120 × 60 × 0.03 mm
+  // =====================================================
+  else if (perfilId === "herreria") {
+    const tipoTrabajo = orden.tipoTrabajo
+      ? String(orden.tipoTrabajo).trim()
+      : "";
+
+    const material = orden.material
+      ? String(orden.material).trim()
+      : "";
+
+    const largo = orden.largo
+      ? String(orden.largo).trim()
+      : "";
+
+    const ancho = orden.ancho
+      ? String(orden.ancho).trim()
+      : "";
+
+    const alto = orden.alto
+      ? String(orden.alto).trim()
+      : "";
+
+    const espesor = orden.espesor
+      ? String(orden.espesor).trim()
+      : "";
+
+    const unidad = orden.unidadMedida
+      ? String(orden.unidadMedida).trim()
+      : "";
+
+    if (tipoTrabajo) detalles.push(tipoTrabajo);
+    if (material) detalles.push(material);
+
+    const dimensiones = [];
+
+    if (largo) dimensiones.push(largo);
+    if (ancho) dimensiones.push(ancho);
+    if (alto) dimensiones.push(alto);
+
+    if (espesor) {
+      dimensiones.push(
+        "esp. " + espesor
+      );
+    }
+
+    if (dimensiones.length) {
+      detalles.push(
+        dimensiones.join(" × ") +
+        (unidad ? " " + unidad : "")
+      );
+    }
+  }
+
+  // =====================================================
+  // TORNO INDUSTRIAL
+  // Trabajo · Material · diámetro × longitud
+  // Ejemplo:
+  // Torno industrial · Rectificado · Acero inoxidable · Ø30 × 120 mm
+  // =====================================================
+  else if (perfilId === "torno-industrial") {
+    const tipoTrabajo = orden.tipoTrabajo
+      ? String(orden.tipoTrabajo).trim()
+      : "";
+
+    const material = orden.material
+      ? String(orden.material).trim()
+      : "";
+
+    const diametro = orden.diametro
+      ? String(orden.diametro).trim()
+      : "";
+
+    const longitud = orden.longitud
+      ? String(orden.longitud).trim()
+      : "";
+
+    if (tipoTrabajo) detalles.push(tipoTrabajo);
+    if (material) detalles.push(material);
+
+    const dimensiones = [];
+
+    if (diametro) {
+      dimensiones.push("Ø" + diametro);
+    }
+
+    if (longitud) {
+      dimensiones.push(longitud);
+    }
+
+    if (dimensiones.length) {
+      detalles.push(
+        dimensiones.join(" × ") + " mm"
+      );
+    }
+  }
+
+  // =====================================================
+  // CARPINTERÍA
+  // Trabajo · Material · dimensiones
+  // Ejemplo:
+  // Carpintería · Fabricación · MDF · 120 × 60 × 18 mm
+  // =====================================================
+  else if (perfilId === "carpinteria") {
+    const tipoTrabajo = orden.tipoTrabajo
+      ? String(orden.tipoTrabajo).trim()
+      : "";
+
+    const material = orden.material
+      ? String(orden.material).trim()
+      : "";
+
+    const largo = orden.largo
+      ? String(orden.largo).trim()
+      : "";
+
+    const ancho = orden.ancho
+      ? String(orden.ancho).trim()
+      : "";
+
+    const alto = orden.alto
+      ? String(orden.alto).trim()
+      : "";
+
+    const espesor = orden.espesor
+      ? String(orden.espesor).trim()
+      : "";
+
+    const unidad = orden.unidadMedida
+      ? String(orden.unidadMedida).trim()
+      : "";
+
+    if (tipoTrabajo) detalles.push(tipoTrabajo);
+    if (material) detalles.push(material);
+
+    const dimensiones = [];
+
+    if (largo) dimensiones.push(largo);
+    if (ancho) dimensiones.push(ancho);
+    if (alto) dimensiones.push(alto);
+
+    if (espesor) {
+      dimensiones.push(
+        "esp. " + espesor
+      );
+    }
+
+    if (dimensiones.length) {
+      detalles.push(
+        dimensiones.join(" × ") +
+        (unidad ? " " + unidad : "")
+      );
+    }
+  }
+
+  // =====================================================
+  // PERFIL GENÉRICO
+  // Si en el futuro agregamos otro perfil y todavía
+  // no tiene una regla específica, utilizamos los
+  // primeros campos con información.
+  // =====================================================
+  else {
+    const valores = (perfil.campos || [])
+      .map(campo => ({
+        nombre: campo.nombre,
+        valor: orden[campo.id]
+      }))
+      .filter(item =>
+        item.valor !== undefined &&
+        item.valor !== null &&
+        String(item.valor).trim() !== ""
+      );
+
+    detalles = valores
+      .slice(0, 3)
+      .map(item => String(item.valor));
+  }
 
   return perfil.nombre + (
     detalles.length
