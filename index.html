@@ -1326,26 +1326,51 @@ function renderList() {
   let items = [...ordenes];
   if (filtroEstado !== "Todos") items = items.filter(o => o.estado === filtroEstado);
 if (busqueda.trim()) {
-const normalizar = (valor) =>
-  String(valor ?? "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]/g, "");
+  const normalizar = (valor) =>
+    String(valor ?? "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, "");
 
   const q = normalizar(busqueda);
 
   items = items.filter(o => {
+    const perfil = obtenerPerfilDeOrden(o);
+
+    const valoresTecnicos = (perfil?.campos || [])
+      .map(campo => o[campo.id])
+      .filter(valor =>
+        valor !== undefined &&
+        valor !== null &&
+        valor !== ""
+      );
+
+    const nombresMateriales = (o.materialesItems || [])
+      .flatMap(item => [
+        item.nombre,
+        item.unidad,
+        item.cantidad,
+        item.precio,
+        item.subtotal
+      ])
+      .filter(valor =>
+        valor !== undefined &&
+        valor !== null &&
+        valor !== ""
+      );
+
     const texto = [
       o.cliente,
       o.nit,
       o.telefono,
-      o.marca,
-      o.tipo,
-      o.potencia,
-      o.voltaje,
       o.falla,
-      "ORD-" + ordenNumero(o.id)
+      o.notas,
+      "ORD-" + ordenNumero(o.id),
+
+      ...valoresTecnicos,
+      ...nombresMateriales
     ]
-      .filter(v => v !== undefined && v !== null)
       .map(normalizar)
       .join(" ");
 
