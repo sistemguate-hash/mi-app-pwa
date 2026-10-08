@@ -3923,11 +3923,60 @@ render();
           return;
         }
 
-        alert(
-          "Confirmación recibida.\n\n" +
-          "Todavía no se han escrito datos. " +
-          "El siguiente paso será implementar el guardado seguro."
+       
+        const transaccion = database.transaction(
+          ["ordenes", "materiales", "clientes"],
+          "readwrite"
         );
+
+        try {
+          for (const [nombre, registros] of colecciones) {
+            const almacen = transaccion.objectStore(nombre);
+
+            for (const registro of registros) {
+              almacen.put(registro);
+            }
+          }
+
+          await new Promise((resolve, reject) => {
+            transaccion.oncomplete = () => resolve();
+
+            transaccion.onerror = () => {
+              reject(
+                transaccion.error ||
+                new Error("Error al guardar el respaldo")
+              );
+            };
+
+            transaccion.onabort = () => {
+              reject(
+                transaccion.error ||
+                new Error("La restauración fue cancelada")
+              );
+            };
+          });
+
+          await emitir("ordenes");
+          await emitir("materiales");
+          await emitir("clientes");
+
+          alert(
+            "Respaldo restaurado correctamente.\n\n" +
+            "Órdenes procesadas: " + respaldo.datos.ordenes.length + "\n" +
+            "Materiales procesados: " + respaldo.datos.materiales.length + "\n" +
+            "Clientes procesados: " + respaldo.datos.clientes.length + "\n\n" +
+            "Los registros actuales que no estaban en el respaldo se conservaron."
+          );
+        } catch (error) {
+          console.error("Error restaurando respaldo:", error);
+
+          alert(
+            "No se pudo completar la restauración.\n\n" +
+            "Error: " + error.message +
+            "\n\nNo vuelvas a intentarlo hasta verificar los datos."
+          );
+        }
+
       } catch (error) {
         console.error("Error validando respaldo:", error);
         alert(
