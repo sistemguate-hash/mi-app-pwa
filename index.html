@@ -1879,40 +1879,148 @@ function renderCatSelect() {
 
 function renderCatList() {
   const el = document.getElementById("catList");
+
   if (!el) return;
+
   if (!catalogo.length) {
-    el.innerHTML = '<div class="empty" style="padding:16px 0;">Aún no hay materiales. Agrega el primero arriba.</div>';
+    el.innerHTML =
+      '<div class="empty" style="padding:16px 0;">Aún no hay materiales. Agrega el primero arriba.</div>';
+
     return;
   }
+
   el.innerHTML = catalogo.map(m => `
     <div class="cat-row" data-id="${m.id}">
-      <div><strong>${escapeHtml(m.nombre)}</strong><div style="color:var(--text-dim); font-size:12.5px;">${fmtQ(m.precio)} / ${escapeHtml(m.unidad || "unidad")}</div></div>
-      <div style="display:flex; gap:6px;">
-        <button type="button" class="btn-sm cat-edit">Editar</button>
-        <button type="button" class="btn-sm danger cat-del">Eliminar</button>
+
+      <div>
+        <strong>${escapeHtml(m.nombre)}</strong>
+
+        <div style="
+          color:var(--text-dim);
+          font-size:12.5px;
+        ">
+          ${fmtQ(m.precio)} /
+          ${escapeHtml(m.unidad || "unidad")}
+        </div>
       </div>
+
+      <div style="
+        display:flex;
+        gap:6px;
+      ">
+        <button
+          type="button"
+          class="btn-sm cat-edit"
+        >
+          Editar
+        </button>
+
+        <button
+          type="button"
+          class="btn-sm danger cat-del"
+        >
+          Eliminar
+        </button>
+      </div>
+
     </div>
   `).join("");
+
+  // EDITAR MATERIAL
   el.querySelectorAll(".cat-edit").forEach(btn => {
+
     btn.onclick = () => {
-      const id = btn.closest(".cat-row").dataset.id;
-      const m = catalogo.find(x => x.id === id);
+
+      const id =
+        btn.closest(".cat-row").dataset.id;
+
+      const m =
+        catalogo.find(x => x.id === id);
+
       if (!m) return;
+
       catEditId = id;
-      document.getElementById("cat-nombre").value = m.nombre;
-      document.getElementById("cat-unidad").value = m.unidad || "";
-      document.getElementById("cat-precio").value = m.precio;
-      document.getElementById("btnCatSave").textContent = "Guardar cambios";
+
+      document.getElementById("cat-nombre").value =
+        m.nombre;
+
+      document.getElementById("cat-unidad").value =
+        m.unidad || "";
+
+      document.getElementById("cat-precio").value =
+        m.precio;
+
+      document.getElementById("btnCatSave").textContent =
+        "Guardar cambios";
     };
+
   });
+
+  // ELIMINAR MATERIAL
   el.querySelectorAll(".cat-del").forEach(btn => {
+
     btn.onclick = async () => {
-      const id = btn.closest(".cat-row").dataset.id;
-      catalogo = catalogo.filter(x => x.id !== id);
-      renderCatList(); renderCatSelect();
-      if (db) { try { await db.doc("materiales/" + id).delete(); } catch (e) {} }
+
+      const id =
+        btn.closest(".cat-row").dataset.id;
+
+      const material =
+        catalogo.find(x => x.id === id);
+
+      if (!material) return;
+
+      const confirmar = confirm(
+        '¿Deseas eliminar el material "' +
+        material.nombre +
+        '"?'
+      );
+
+      if (!confirmar) return;
+
+      // Guardamos el catálogo actual por si la eliminación falla
+      const catalogoAnterior = [...catalogo];
+
+      // Eliminación visual inmediata
+      catalogo = catalogo.filter(
+        x => x.id !== id
+      );
+
+      renderCatList();
+      renderCatSelect();
+
+      if (db) {
+
+        try {
+
+          await db
+            .doc("materiales/" + id)
+            .delete();
+
+        } catch (e) {
+
+          // Restaurar el material si la eliminación falló
+          catalogo = catalogoAnterior;
+
+          renderCatList();
+          renderCatSelect();
+
+          alert(
+            "No se pudo eliminar el material. " +
+            "El registro fue restaurado."
+          );
+
+          console.error(
+            "Error eliminando material:",
+            e
+          );
+        }
+
+      }
+
     };
+
   });
+
 }
 
 function limpiarFormCatalogo() {
