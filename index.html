@@ -2184,7 +2184,7 @@ function abrirFichaCliente(clienteId) {
     "
     onclick="
       document.getElementById('clienteFichaOverlay').classList.remove('open');
-      abrirSheetEditor('${o.id}');
+    abrirSheetEditar('${o.id}');
     "
   >
     <div style="min-width:0;">
@@ -2196,12 +2196,7 @@ function abrirFichaCliente(clienteId) {
         margin-top:3px;
       ">
         ${fmtFecha(o.fechaIngreso)}
-        · ${escapeHtml(o.tipo || "Motor")}
-        ${
-          o.potencia
-            ? " · " + escapeHtml(o.potencia) + " HP"
-            : ""
-        }
+· ${escapeHtml(obtenerResumenEquipo(o))}
       </div>
 
       <div style="
