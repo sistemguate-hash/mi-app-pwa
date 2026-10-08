@@ -2838,68 +2838,7 @@ renderItemsMateriales();
 
 function cerrarSheet() { document.getElementById("overlay").classList.remove("open"); }
 
-async function guardar() {
-  try {
-  const clienteId = document.getElementById("f-cliente").value;
-const clienteObj = clientes.find(c => c.id === clienteId);
-
-const cliente = clienteObj ? clienteObj.nombre : "";
-    if (!cliente) {
-      alert("Ingresa el nombre del cliente antes de guardar.");
-      document.getElementById("f-cliente").focus();
-      return;
-    }
-    
- const ordenExistente = editId
-  ? ordenes.find(x => x.id === editId)
-  : null;
-
-const perfilParaGuardar = ordenExistente
-  ? (
-      ordenExistente.perfilTaller ||
-      (
-        Object.keys(PERFILES_TALLER).find(
-          id => PERFILES_TALLER[id] === obtenerPerfilDeOrden(ordenExistente)
-        )
-      ) ||
-      "motores-electricos"
-    )
-  : (
-      localStorage.getItem("perfilTaller") ||
-      "motores-electricos"
-    );
-
-const datos = {
-  cliente,
-  telefono: document.getElementById("f-telefono").value.trim(),
-  nit: document.getElementById("f-nit").value.trim(),
-
-  perfilTaller: perfilParaGuardar,
-
-  ...obtenerValoresCamposTecnicos(ordenExistente),
-
-  falla: document.getElementById("f-falla").value.trim(),
-  materiales: materialesTotal(),
-  materialesItems: itemsActuales,
-  horas: Number(document.getElementById("f-horas").value) || 0,
-  tarifa: Number(document.getElementById("f-tarifa").value) || 0,
-  margen: Number(document.getElementById("f-margen").value) || 0,
-total: Number(document.getElementById("f-total").value) || 0,
-facturacionFinal: Number(document.getElementById("f-facturacion-final").value) || 0,
-  notas: document.getElementById("f-notas").value.trim(),
-  fotos: fotosActuales
-};
-
-    if (editId) {
-      const idx = ordenes.findIndex(x => x.id === editId);
-      if (idx > -1) ordenes[idx] = { ...ordenes[idx], ...datos };
-      cerrarSheet();
-      render();
-      if (db) {
-        try { await db.doc("ordenes/" + editId).update(datos); }
-        catch (e) { alert("No se pudo guardar en el servidor (se quedó solo en este dispositivo): " + (e && e.code ? e.code : e)); }
-      }
-      function siguienteNumeroOrden() {
+function siguienteNumeroOrden() {
   const numeros = ordenes
     .map(o => Number(o.numeroOrden))
     .filter(n => Number.isFinite(n) && n > 0);
@@ -2910,25 +2849,144 @@ facturacionFinal: Number(document.getElementById("f-facturacion-final").value) |
 
   return maximo + 1;
 }
-    } else {
-      const id = "m" + Date.now();
-     const nueva = {
-  id,
-  ...datos,
-  numeroOrden: siguienteNumeroOrden(),
-  estado: "Recibido",
-  fechaIngreso: new Date().toISOString()
-};
-      ordenes.push(nueva);
+
+async function guardar() {
+  try {
+    const clienteId = document.getElementById("f-cliente").value;
+    const clienteObj = clientes.find(c => c.id === clienteId);
+
+    const cliente = clienteObj ? clienteObj.nombre : "";
+
+    if (!cliente) {
+      alert("Ingresa el nombre del cliente antes de guardar.");
+      document.getElementById("f-cliente").focus();
+      return;
+    }
+
+    const ordenExistente = editId
+      ? ordenes.find(x => x.id === editId)
+      : null;
+
+    const perfilParaGuardar = ordenExistente
+      ? (
+          ordenExistente.perfilTaller ||
+          (
+            Object.keys(PERFILES_TALLER).find(
+              id =>
+                PERFILES_TALLER[id] ===
+                obtenerPerfilDeOrden(ordenExistente)
+            )
+          ) ||
+          "motores-electricos"
+        )
+      : (
+          localStorage.getItem("perfilTaller") ||
+          "motores-electricos"
+        );
+
+    const datos = {
+      cliente,
+      telefono: document.getElementById("f-telefono").value.trim(),
+      nit: document.getElementById("f-nit").value.trim(),
+
+      perfilTaller: perfilParaGuardar,
+
+      ...obtenerValoresCamposTecnicos(ordenExistente),
+
+      falla: document.getElementById("f-falla").value.trim(),
+      materiales: materialesTotal(),
+      materialesItems: itemsActuales,
+
+      horas:
+        Number(document.getElementById("f-horas").value) || 0,
+
+      tarifa:
+        Number(document.getElementById("f-tarifa").value) || 0,
+
+      margen:
+        Number(document.getElementById("f-margen").value) || 0,
+
+      total:
+        Number(document.getElementById("f-total").value) || 0,
+
+      facturacionFinal:
+        Number(
+          document.getElementById("f-facturacion-final").value
+        ) || 0,
+
+      notas:
+        document.getElementById("f-notas").value.trim(),
+
+      fotos: fotosActuales
+    };
+
+    // EDITAR ORDEN EXISTENTE
+    if (editId) {
+
+      const idx = ordenes.findIndex(x => x.id === editId);
+
+      if (idx > -1) {
+        ordenes[idx] = {
+          ...ordenes[idx],
+          ...datos
+        };
+      }
+
       cerrarSheet();
       render();
+
       if (db) {
-        try { await db.doc("ordenes/" + id).set(nueva); }
-        catch (e) { alert("No se pudo guardar en el servidor (se quedó solo en este dispositivo): " + (e && e.code ? e.code : e)); }
+        try {
+          await db
+            .doc("ordenes/" + editId)
+            .update(datos);
+        } catch (e) {
+          alert(
+            "No se pudo guardar en el servidor " +
+            "(se quedó solo en este dispositivo): " +
+            (e && e.code ? e.code : e)
+          );
+        }
+      }
+
+    } else {
+
+      // NUEVA ORDEN
+      const id = "m" + Date.now();
+
+      const nueva = {
+        id,
+        ...datos,
+        numeroOrden: siguienteNumeroOrden(),
+        estado: "Recibido",
+        fechaIngreso: new Date().toISOString()
+      };
+
+      ordenes.push(nueva);
+
+      cerrarSheet();
+      render();
+
+      if (db) {
+        try {
+          await db
+            .doc("ordenes/" + id)
+            .set(nueva);
+        } catch (e) {
+          alert(
+            "No se pudo guardar en el servidor " +
+            "(se quedó solo en este dispositivo): " +
+            (e && e.code ? e.code : e)
+          );
+        }
       }
     }
+
   } catch (err) {
-    alert("Ocurrió un error al guardar: " + (err && err.message ? err.message : err));
+    alert(
+      "Ocurrió un error al guardar: " +
+      (err && err.message ? err.message : err)
+    );
   }
 }
 
