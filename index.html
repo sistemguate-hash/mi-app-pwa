@@ -2839,15 +2839,61 @@ renderItemsMateriales();
 function cerrarSheet() { document.getElementById("overlay").classList.remove("open"); }
 
 function siguienteNumeroOrden() {
+  let ultimoNumero = Number(
+    localStorage.getItem("ultimoNumeroOrden")
+  );
+
+  // Si todavía no existe el contador,
+  // inicializarlo usando el número más alto
+  // de las órdenes actuales.
+  if (!Number.isFinite(ultimoNumero) || ultimoNumero < 0) {
+    const numeros = ordenes
+      .map(o => Number(o.numeroOrden))
+      .filter(
+        n => Number.isFinite(n) && n > 0
+      );
+
+    ultimoNumero = numeros.length
+      ? Math.max(...numeros)
+      : 0;
+  }
+
+  const siguiente = ultimoNumero + 1;
+
+  // Guardar inmediatamente el último número utilizado.
+  localStorage.setItem(
+    "ultimoNumeroOrden",
+    String(siguiente)
+  );
+
+  return siguiente;
+}
+function inicializarContadorOrdenes() {
+  const contadorActual = Number(
+    localStorage.getItem("ultimoNumeroOrden")
+  );
+
+  if (
+    Number.isFinite(contadorActual) &&
+    contadorActual > 0
+  ) {
+    return;
+  }
+
   const numeros = ordenes
     .map(o => Number(o.numeroOrden))
-    .filter(n => Number.isFinite(n) && n > 0);
+    .filter(
+      n => Number.isFinite(n) && n > 0
+    );
 
   const maximo = numeros.length
     ? Math.max(...numeros)
     : 0;
 
-  return maximo + 1;
+  localStorage.setItem(
+    "ultimoNumeroOrden",
+    String(maximo)
+  );
 }
 
 async function guardar() {
@@ -3562,6 +3608,8 @@ render();
   ordenes = snap.docs.map(d => d.data());
 
   await asegurarNumerosOrden();
+
+  inicializarContadorOrdenes();
 
   render();
 });
