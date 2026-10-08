@@ -3365,6 +3365,13 @@ render();
     navigator.serviceWorker.register('./sw.js')
       .then(() => console.log('Service Worker Registrado Exitosamente'))
       .catch((err) => console.log('Error al registrar el Service Worker', err));
+      document.addEventListener("wheel", (event) => {
+  const campo = event.target.closest('input[type="number"]');
+
+  if (campo && document.activeElement === campo) {
+    campo.blur();
+  }
+}, { passive: true });
   }
 </script>
 
