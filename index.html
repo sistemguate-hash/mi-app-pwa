@@ -1464,7 +1464,7 @@ function obtenerResumenEquipo(orden) {
 
     if (dimensiones.length) {
       detalles.push(
-        dimensiones.join(" × ") + " mm"
+       dimensiones.join(" × ") + (orden.unidadMedida ? " " + orden.unidadMedida : "")
       );
     }
   }
