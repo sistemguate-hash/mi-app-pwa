@@ -3502,7 +3502,6 @@ on("btnSave", "onclick", guardar);
 on("btnConfiguracion", "onclick", abrirConfiguracion);
 on("btnCancelarConfiguracion", "onclick", cerrarConfiguracion);
 on("btnGuardarConfiguracion", "onclick", guardarConfiguracion);
-on("btnExportarRespaldo", "onclick", exportarRespaldo);
 on("search", "oninput", (e) => { busqueda = e.target.value; render(); });
 on("btnCatalogo", "onclick", abrirCatalogo);
 on("btnClientes", "onclick", () => {
@@ -3827,6 +3826,7 @@ render();
         alert("No se pudo exportar el respaldo. Revisa la consola para más detalles.");
       }
     }
+        document.getElementById("btnExportarRespaldo").onclick = exportarRespaldo;
 
 
     const listeners = {
