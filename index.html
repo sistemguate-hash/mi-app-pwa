@@ -801,6 +801,12 @@ const PERFILES_TALLER = {
         obligatorio: false
       },
       {
+  id: "color",
+  nombre: "Color",
+  tipo: "text",
+  obligatorio: false
+},
+      {
         id: "anio",
         nombre: "Año",
         tipo: "number",
@@ -812,6 +818,12 @@ const PERFILES_TALLER = {
         tipo: "text",
         obligatorio: false
       },
+      {
+  id: "vin",
+  nombre: "VIN / Número de chasis",
+  tipo: "text",
+  obligatorio: false
+},
       {
         id: "kilometraje",
         nombre: "Kilometraje",
@@ -893,7 +905,6 @@ const PERFILES_TALLER = {
         nombre: "Espesor",
         tipo: "number",
         obligatorio: false,
-        unidad: "mm"
       },
       {
         id: "largo",
@@ -918,7 +929,7 @@ const PERFILES_TALLER = {
         nombre: "Unidad de medida",
         tipo: "select",
         obligatorio: false,
-        opciones: ["mm", "cm", "m"]
+        opciones: ["mm", "cm", "m" , "in"]
       },
       {
         id: "cantidad",
@@ -1086,8 +1097,7 @@ const PERFILES_TALLER = {
         nombre: "Espesor",
         tipo: "number",
         obligatorio: false,
-        unidad: "mm"
-      },
+       },
       {
         id: "unidadMedida",
         nombre: "Unidad de medida",
