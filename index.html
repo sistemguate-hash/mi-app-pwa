@@ -1699,31 +1699,71 @@ function renderFotosRow() {
   document.getElementById("archivoAddBtn").onclick = () => document.getElementById("f-archivo-input").click();
 }
 
-function fileADataUrl(file, maxDim, quality) {
-  maxDim = maxDim || 1100; quality = quality || 0.72;
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const img = new Image();
-      img.onload = () => {
-        let w = img.width, h = img.height;
-        if (w > maxDim || h > maxDim) {
-          const s = maxDim / Math.max(w, h);
-          w = Math.round(w * s); h = Math.round(h * s);
-        }
-        const canvas = document.createElement("canvas");
-        canvas.width = w; canvas.height = h;
-        canvas.getContext("2d").drawImage(img, 0, 0, w, h);
-        try { resolve(canvas.toDataURL("image/jpeg", quality)); } catch (e) { reject(e); }
-      };
-      img.onerror = reject;
-      img.src = reader.result;
-    };
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
+async function fileADataUrl(file, maxDim, quality) {
+  maxDim = maxDim || 1100;
+  quality = quality || 0.72;
 
+  try {
+    // Detectar y convertir HEIC/HEIF
+    if (
+      typeof HeicTo !== "undefined" &&
+      await HeicTo.isHeic(file)
+    ) {
+      console.log("Imagen HEIC/HEIF detectada. Convirtiendo a JPEG...");
+
+      file = await HeicTo({
+        blob: file,
+        type: "image/jpeg",
+        quality: quality
+      });
+
+      console.log("HEIC convertido correctamente a JPEG.");
+    }
+
+    // Procesamiento normal de la imagen
+    return await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        const img = new Image();
+
+        img.onload = () => {
+          let w = img.width;
+          let h = img.height;
+
+          if (w > maxDim || h > maxDim) {
+            const s = maxDim / Math.max(w, h);
+            w = Math.round(w * s);
+            h = Math.round(h * s);
+          }
+
+          const canvas = document.createElement("canvas");
+          canvas.width = w;
+          canvas.height = h;
+
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, w, h);
+
+          try {
+            resolve(canvas.toDataURL("image/jpeg", quality));
+          } catch (e) {
+            reject(e);
+          }
+        };
+
+        img.onerror = reject;
+        img.src = reader.result;
+      };
+
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+
+  } catch (error) {
+    console.error("Error procesando imagen:", error);
+    throw error;
+  }
+}
 async function subirFotos(e) {
   const files = Array.from(e.target.files || []);
   if (!files.length) return;
