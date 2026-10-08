@@ -542,6 +542,40 @@ input[type="number"] {
     </div>
   </div>
 </div>
+
+    <div style="border-top:1px solid var(--border); margin-top:20px; padding-top:16px;">
+      <h3 style="font-size:15px; margin:0 0 6px;">
+        Respaldo de datos
+      </h3>
+
+      <p style="font-size:12.5px; color:var(--text-dim); line-height:1.5; margin:0 0 12px;">
+        Guarda una copia de tus órdenes, clientes y materiales para poder recuperarlos posteriormente.
+      </p>
+
+      <div class="sheet-actions">
+        <button
+          type="button"
+          class="btn-primary"
+          id="btnExportarRespaldo">
+          Exportar respaldo
+        </button>
+
+        <button
+          type="button"
+          class="btn-cancel"
+          id="btnRestaurarRespaldo"
+          style="flex:1;">
+          Restaurar respaldo
+        </button>
+      </div>
+
+      <input
+        type="file"
+        id="archivoRespaldo"
+        accept=".json,application/json"
+        style="display:none;">
+    </div>
+
 <script>
  
 const ESTADOS = ["Recibido", "Diagnóstico", "En proceso", "Listo", "Entregado"];
@@ -3468,6 +3502,7 @@ on("btnSave", "onclick", guardar);
 on("btnConfiguracion", "onclick", abrirConfiguracion);
 on("btnCancelarConfiguracion", "onclick", cerrarConfiguracion);
 on("btnGuardarConfiguracion", "onclick", guardarConfiguracion);
+on("btnExportarRespaldo", "onclick", exportarRespaldo);
 on("search", "oninput", (e) => { busqueda = e.target.value; render(); });
 on("btnCatalogo", "onclick", abrirCatalogo);
 on("btnClientes", "onclick", () => {
@@ -3742,6 +3777,57 @@ render();
     }
 
     const database = await abrirBaseLocal();
+    
+    async function exportarRespaldo() {
+      try {
+        const ordenesRespaldo = await obtenerTodos(database, "ordenes");
+        const materialesRespaldo = await obtenerTodos(database, "materiales");
+        const clientesRespaldo = await obtenerTodos(database, "clientes");
+
+        const respaldo = {
+          aplicacion: "mi-app-pwa",
+          versionFormato: 1,
+          fechaExportacion: new Date().toISOString(),
+          datos: {
+            ordenes: ordenesRespaldo,
+            materiales: materialesRespaldo,
+            clientes: clientesRespaldo
+          }
+        };
+
+        const contenido = JSON.stringify(respaldo, null, 2);
+        const archivo = new Blob(
+          [contenido],
+          { type: "application/json;charset=utf-8" }
+        );
+
+        const url = URL.createObjectURL(archivo);
+        const enlace = document.createElement("a");
+
+        const fecha = new Date().toISOString().slice(0, 10);
+
+        enlace.href = url;
+        enlace.download = `respaldo-mi-app-pwa-${fecha}.json`;
+
+        document.body.appendChild(enlace);
+        enlace.click();
+        enlace.remove();
+
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+        alert(
+          "Respaldo exportado correctamente.\n\n" +
+          "Órdenes: " + ordenesRespaldo.length + "\n" +
+          "Materiales: " + materialesRespaldo.length + "\n" +
+          "Clientes: " + clientesRespaldo.length + "\n\n" +
+          "Guarda el archivo en un lugar seguro."
+        );
+      } catch (error) {
+        console.error("Error exportando respaldo:", error);
+        alert("No se pudo exportar el respaldo. Revisa la consola para más detalles.");
+      }
+    }
+
 
     const listeners = {
   ordenes: [],
