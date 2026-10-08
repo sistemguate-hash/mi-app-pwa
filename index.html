@@ -3832,6 +3832,54 @@ render();
       document.getElementById("archivoRespaldo").click();
     };
 
+    document.getElementById("archivoRespaldo").onchange = async (evento) => {
+      const archivo = evento.target.files[0];
+
+      if (!archivo) {
+        return;
+      }
+
+      try {
+        const texto = await archivo.text();
+        const respaldo = JSON.parse(texto);
+
+        const datosValidos =
+          respaldo &&
+          respaldo.aplicacion === "mi-app-pwa" &&
+          respaldo.versionFormato === 1 &&
+          respaldo.datos &&
+          Array.isArray(respaldo.datos.ordenes) &&
+          Array.isArray(respaldo.datos.materiales) &&
+          Array.isArray(respaldo.datos.clientes);
+
+        if (!datosValidos) {
+          alert(
+            "El archivo no es un respaldo válido de mi-app-pwa.\n\n" +
+            "No se ha modificado ningún dato."
+          );
+          return;
+        }
+
+        alert(
+          "Archivo de respaldo válido.\n\n" +
+          "Fecha de exportación: " +
+          (respaldo.fechaExportacion || "No disponible") + "\n\n" +
+          "Órdenes: " + respaldo.datos.ordenes.length + "\n" +
+          "Materiales: " + respaldo.datos.materiales.length + "\n" +
+          "Clientes: " + respaldo.datos.clientes.length + "\n\n" +
+          "Todavía no se ha restaurado ningún dato."
+        );
+      } catch (error) {
+        console.error("Error validando respaldo:", error);
+        alert(
+          "No se pudo leer el archivo seleccionado.\n\n" +
+          "Verifica que sea un archivo JSON válido."
+        );
+      } finally {
+        evento.target.value = "";
+      }
+    };
+
 
 
     const listeners = {
