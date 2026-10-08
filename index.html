@@ -2362,6 +2362,15 @@ ${camposTecnicosHtml}
       <strong>Total presupuesto</strong>
       <div>${fmtQ(orden.total || 0)}</div>
     </div>
+    
+    <div class="cat-row" style="
+  margin-top:4px;
+  font-size:16px;
+  font-weight:700;
+">
+  <strong>Facturación final</strong>
+  <div>${fmtQ(orden.facturacionFinal ?? 0)}</div>
+</div>
 
     <div style="
       margin:16px 0 10px;
