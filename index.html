@@ -2362,7 +2362,7 @@ ${camposTecnicosHtml}
       <strong>Total presupuesto</strong>
       <div>${fmtQ(orden.total || 0)}</div>
     </div>
-    
+
     <div class="cat-row" style="
   margin-top:4px;
   font-size:16px;
@@ -2821,6 +2821,8 @@ function getImgSize(dataUrl) {
 
 async function exportarPDF(id, btn) {
   const o = ordenes.find(x => x.id === id);
+  console.log("ORDEN PDF:", o);
+console.log("PERFIL PDF:", o?.perfilTaller);
   if (!o || !window.jspdf) return;
   if (btn) btn.classList.add("busy");
   try {
@@ -2838,32 +2840,50 @@ async function exportarPDF(id, btn) {
       doc.setFont("helvetica", "normal"); doc.text(String(valor || "—"), 60, y);
       y += 8;
     };
+    const perfilOrden = obtenerPerfilDeOrden(o);
     campo("Cliente:", o.cliente);
     campo("NIT:", o.nit);
     campo("Teléfono:", o.telefono);
-    campo("Tipo de motor:", o.tipo);
-    campo(
-  "Potencia:",
-  (o.potencia || "") + " " + (o.unidadPotencia || "HP")
-);
-campo("Voltaje:", o.voltaje);
-campo("Marca:", o.marca);
-
-doc.setFont("helvetica", "bold");
-doc.text("Ficha técnica del motor:", 14, y);
+   id="pdf-dinamico"
+   doc.setFont("helvetica", "bold");
+doc.text("Ficha técnica:", 14, y);
 y += 7;
 
 doc.setFont("helvetica", "normal");
 
-if (o.modelo) campo("Modelo:", o.modelo);
-if (o.numeroSerie) campo("Número de serie:", o.numeroSerie);
-if (o.frecuencia) campo("Frecuencia:", o.frecuencia);
-if (o.fases) campo("Fases:", o.fases);
-if (o.corriente) campo("Corriente:", o.corriente + " A");
-if (o.factorPotencia) campo("Factor de potencia:", o.factorPotencia);
-if (o.rpm) campo("RPM:", o.rpm);
-if (o.claseAislamiento) campo("Clase de aislamiento:", o.claseAislamiento);
-if (o.gradoProteccion) campo("Grado de protección:", o.gradoProteccion);
+perfilOrden.campos.forEach(campoPerfil => {
+  const valor = o[campoPerfil.id];
+
+  if (valor === undefined || valor === null || valor === "") {
+    return;
+  }
+
+  let valorMostrar = String(valor);
+
+  // Agregar unidad seleccionada cuando corresponda
+  if (
+    campoPerfil.id === "potencia" &&
+    o.unidadPotencia
+  ) {
+    valorMostrar += " " + o.unidadPotencia;
+  }
+
+  if (
+    [
+      "espesor",
+      "longitud",
+      "ancho",
+      "altura",
+      "diametro",
+      "diametroInterior"
+    ].includes(campoPerfil.id) &&
+    o.unidadMedida
+  ) {
+    valorMostrar += " " + o.unidadMedida;
+  }
+
+  campo(campoPerfil.nombre + ":", valorMostrar);
+});
 
 y += 2;
 doc.line(14, y, 196, y);
@@ -2895,6 +2915,10 @@ campo("Margen / adicional:", fmtQ(o.margen || 0));
 doc.setFont("helvetica", "bold");
 doc.text("Total presupuesto:", 14, y);
 doc.text(fmtQ(o.total), 60, y);
+y += 8;
+doc.setFont("helvetica", "bold");
+doc.text("Facturación final:", 14, y);
+doc.text(fmtQ(o.facturacionFinal ?? 0), 60, y);
 y += 8;
     if (o.notas) { doc.setFont("helvetica", "normal"); doc.text(doc.splitTextToSize("Notas: " + o.notas, 180), 14, y); y += 10; }
 if (o.fotos && o.fotos.length) {
