@@ -1221,9 +1221,73 @@ function fmtFecha(iso) {
 }
 
 function ordenNumero(id) {
-  const sorted = [...ordenes].sort((a,b) => new Date(a.fechaIngreso) - new Date(b.fechaIngreso));
+  const orden = ordenes.find(o => o.id === id);
+
+  if (!orden) return "000";
+
+  // Usar el número permanente guardado en la orden
+  const numero = Number(orden.numeroOrden);
+
+  if (Number.isFinite(numero) && numero > 0) {
+    return String(numero).padStart(3, "0");
+  }
+
+  // Respaldo temporal para órdenes antiguas
+  // mientras se completa la migración.
+  const sorted = [...ordenes].sort(
+    (a, b) => new Date(a.fechaIngreso) - new Date(b.fechaIngreso)
+  );
+
   const idx = sorted.findIndex(o => o.id === id);
+
   return String(idx + 1).padStart(3, "0");
+}
+async function asegurarNumerosOrden() {
+  if (!db || !ordenes.length) return;
+
+  const ordenesSinNumero = ordenes.filter(o => {
+    const numero = Number(o.numeroOrden);
+    return !Number.isFinite(numero) || numero <= 0;
+  });
+
+  if (!ordenesSinNumero.length) return;
+
+  // Mantener el orden histórico de las órdenes existentes
+  const ordenadas = [...ordenes].sort(
+    (a, b) => new Date(a.fechaIngreso) - new Date(b.fechaIngreso)
+  );
+
+  // Buscar el número más alto que ya exista
+  let siguiente = ordenadas.reduce((max, o) => {
+    const numero = Number(o.numeroOrden);
+    return Number.isFinite(numero) && numero > max
+      ? numero
+      : max;
+  }, 0) + 1;
+
+  for (const orden of ordenadas) {
+    const numeroActual = Number(orden.numeroOrden);
+
+    if (Number.isFinite(numeroActual) && numeroActual > 0) {
+      continue;
+    }
+
+    const numeroAsignado = siguiente++;
+
+    orden.numeroOrden = numeroAsignado;
+
+    try {
+      await db.doc("ordenes/" + orden.id).update({
+        numeroOrden: numeroAsignado
+      });
+    } catch (e) {
+      console.error(
+        "No se pudo guardar el número permanente de la orden:",
+        orden.id,
+        e
+      );
+    }
+  }
 }
 function render() {
   renderStats();
@@ -2835,9 +2899,26 @@ facturacionFinal: Number(document.getElementById("f-facturacion-final").value) |
         try { await db.doc("ordenes/" + editId).update(datos); }
         catch (e) { alert("No se pudo guardar en el servidor (se quedó solo en este dispositivo): " + (e && e.code ? e.code : e)); }
       }
+      function siguienteNumeroOrden() {
+  const numeros = ordenes
+    .map(o => Number(o.numeroOrden))
+    .filter(n => Number.isFinite(n) && n > 0);
+
+  const maximo = numeros.length
+    ? Math.max(...numeros)
+    : 0;
+
+  return maximo + 1;
+}
     } else {
       const id = "m" + Date.now();
-      const nueva = { id, ...datos, estado: "Recibido", fechaIngreso: new Date().toISOString() };
+     const nueva = {
+  id,
+  ...datos,
+  numeroOrden: siguienteNumeroOrden(),
+  estado: "Recibido",
+  fechaIngreso: new Date().toISOString()
+};
       ordenes.push(nueva);
       cerrarSheet();
       render();
@@ -3419,10 +3500,13 @@ render();
 
     console.log("Base de datos local iniciada correctamente");
 
-    db.collection("ordenes").onSnapshot((snap) => {
-      ordenes = snap.docs.map(d => d.data());
-      render();
-    });
+    db.collection("ordenes").onSnapshot(async (snap) => {
+  ordenes = snap.docs.map(d => d.data());
+
+  await asegurarNumerosOrden();
+
+  render();
+});
 
     db.collection("materiales").onSnapshot((snap) => {
       catalogo = snap.docs.map(d => d.data());
