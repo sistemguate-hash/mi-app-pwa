@@ -3832,12 +3832,11 @@ render();
       document.getElementById("archivoRespaldo").click();
     };
 
+    
     document.getElementById("archivoRespaldo").onchange = async (evento) => {
       const archivo = evento.target.files[0];
 
-      if (!archivo) {
-        return;
-      }
+      if (!archivo) return;
 
       try {
         const texto = await archivo.text();
@@ -3853,33 +3852,93 @@ render();
           Array.isArray(respaldo.datos.clientes);
 
         if (!datosValidos) {
-          alert(
-            "El archivo no es un respaldo válido de mi-app-pwa.\n\n" +
-            "No se ha modificado ningún dato."
+          alert("El archivo no es un respaldo válido. No se modificó ningún dato.");
+          return;
+        }
+
+        const colecciones = [
+          ["ordenes", respaldo.datos.ordenes],
+          ["materiales", respaldo.datos.materiales],
+          ["clientes", respaldo.datos.clientes]
+        ];
+
+        for (const [nombre, registros] of colecciones) {
+          const ids = new Set();
+
+          for (const registro of registros) {
+            if (
+              !registro ||
+              registro.id === undefined ||
+              registro.id === null ||
+              String(registro.id).trim() === ""
+            ) {
+              throw new Error(
+                "Hay un registro sin identificador en " + nombre
+              );
+            }
+
+            const id = String(registro.id);
+
+            if (ids.has(id)) {
+              throw new Error(
+                "Hay identificadores duplicados en " + nombre
+              );
+            }
+
+            ids.add(id);
+          }
+        }
+
+        const resumen = [];
+
+        for (const [nombre, registros] of colecciones) {
+          const actuales = await obtenerTodos(database, nombre);
+          const idsActuales = new Set(
+            actuales.map(registro => String(registro.id))
           );
+
+          const nuevos = registros.filter(
+            registro => !idsActuales.has(String(registro.id))
+          ).length;
+
+          const existentes = registros.length - nuevos;
+
+          resumen.push(
+            nombre + ": " + nuevos + " nuevos, " +
+            existentes + " existentes que se actualizarían"
+          );
+        }
+
+        const confirmado = confirm(
+          "Respaldo válido: " + archivo.name + "\n\n" +
+          resumen.join("\n") + "\n\n" +
+          "La restauración combinará los registros del archivo " +
+          "con los actuales. Los registros actuales que no estén " +
+          "en el respaldo se conservarán.\n\n" +
+          "¿Deseas continuar con esta restauración?"
+        );
+
+        if (!confirmado) {
+          alert("Operación cancelada. No se modificó ningún dato.");
           return;
         }
 
         alert(
-          "Archivo de respaldo válido.\n\n" +
-          "Fecha de exportación: " +
-          (respaldo.fechaExportacion || "No disponible") + "\n\n" +
-          "Órdenes: " + respaldo.datos.ordenes.length + "\n" +
-          "Materiales: " + respaldo.datos.materiales.length + "\n" +
-          "Clientes: " + respaldo.datos.clientes.length + "\n\n" +
-          "Todavía no se ha restaurado ningún dato."
+          "Confirmación recibida.\n\n" +
+          "Todavía no se han escrito datos. " +
+          "El siguiente paso será implementar el guardado seguro."
         );
       } catch (error) {
         console.error("Error validando respaldo:", error);
         alert(
-          "No se pudo leer el archivo seleccionado.\n\n" +
-          "Verifica que sea un archivo JSON válido."
+          "No se pudo validar el respaldo:\n" +
+          error.message +
+          "\n\nNo se modificó ningún dato."
         );
       } finally {
         evento.target.value = "";
       }
     };
-
 
 
     const listeners = {
