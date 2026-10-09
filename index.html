@@ -71,7 +71,7 @@ input[type=text], input[type=search] {
 }
 .pill.active { background: var(--text); color: var(--bg); border-color: var(--text); }
 button { font-family: inherit; cursor: pointer; }
-.btn-new {
+ .btn-new {
   background: var(--accent); color: #fff; border: none; border-radius: 9px;
   padding: 10px 16px; font-size: 14px; font-weight: 600; width: 100%; margin-bottom: 16px;
 }
@@ -523,24 +523,24 @@ input[type="number"] {
       >
     </div>
 
-    <div class="sheet-actions" style="margin-top:14px;">
-      <button
-        type="button"
-        class="btn-cancel"
-        id="btnCancelarConfiguracion"
-      style="flex:1; min-height:44px; height:44px; box-sizing:border-box;"
-        Cerrar
-      </button>
+    
+<div class="sheet-actions" style="margin-top:14px;">
+  <button
+    type="button"
+    class="btn-cancel"
+    id="btnCancelarConfiguracion"
+    style="flex:1; min-width:0; min-height:44px; height:44px; box-sizing:border-box; color:var(--text-dim);">
+    Cerrar
+  </button>
 
-      <button
-        type="button"
-        class="btn-new"
-        id="btnGuardarConfiguracion"
-  style="flex:1; min-height:44px; height:44px; box-sizing:border-box;"
-        Guardar
-      </button>
- 
-    </div>
+  <button
+    type="button"
+    class="btn-new"
+    id="btnGuardarConfiguracion"
+    style="flex:1; min-width:0; min-height:44px; height:44px; box-sizing:border-box; width:auto; margin-bottom:0; color:#fff;">
+    Guardar
+  </button>
+</div>
 
     <div style="border-top:1px solid var(--border); margin-top:20px; padding-top:16px;">
 
