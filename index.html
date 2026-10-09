@@ -251,10 +251,19 @@ input[type="number"] {
 </head>
 <body>
 <div class="wrap">
-  <header>
-    <div class="title-row"><h1 id="nombreTaller">Taller de Rebobinado</h1></div>
-    <p class="sub">Gestión y seguimiento del taller</p>
-  </header>
+  
+<header>
+  <div class="title-row" id="encabezadoTaller">
+    <img
+      id="logoTaller"
+      alt="Logotipo del taller"
+      hidden
+      style="width:56px;height:56px;object-fit:contain;border-radius:8px;"
+    >
+    <h1 id="nombreTaller">Taller de Rebobinado</h1>
+  </div>
+  <p class="sub">Gestión y seguimiento del taller</p>
+</header>
 
   <div class="stats" id="stats"></div>
 
@@ -522,6 +531,32 @@ input[type="number"] {
         maxlength="5"
       >
     </div>
+    
+<div class="field">
+  <label for="configLogoTaller">Logotipo del taller</label>
+  <input
+    id="configLogoTaller"
+    type="file"
+    accept="image/png,image/jpeg,image/webp"
+  >
+  <div style="margin-top:10px;">
+    <img
+      id="vistaPreviaLogoTaller"
+      alt="Vista previa del logotipo"
+      hidden
+      style="max-width:160px;max-height:100px;object-fit:contain;border:1px solid var(--border);border-radius:8px;padding:6px;"
+    >
+  </div>
+  <button
+    type="button"
+    id="btnQuitarLogoTaller"
+    class="btn-cancel"
+    style="margin-top:8px;width:auto;"
+  >
+    Quitar logotipo
+  </button>
+</div>
+
 
     
 <div class="sheet-actions" style="margin-top:14px;">
@@ -604,12 +639,31 @@ function obtenerNombreTaller() {
   return localStorage.getItem("nombreTaller") || "Taller de Rebobinado";
 }
 
+
 function renderNombreTaller() {
   const el = document.getElementById("nombreTaller");
   if (el) {
     el.textContent = obtenerNombreTaller();
   }
+
+  renderLogoTaller();
 }
+
+function renderLogoTaller() {
+  const logo = document.getElementById("logoTaller");
+  const logoGuardado = localStorage.getItem("logoTaller");
+
+  if (!logo) return;
+
+  if (logoGuardado) {
+    logo.src = logoGuardado;
+    logo.hidden = false;
+  } else {
+    logo.removeAttribute("src");
+    logo.hidden = true;
+  }
+}
+
 function renderEtiquetasMoneda() {
   const moneda = localStorage.getItem("monedaSimbolo") || "Q";
 
@@ -1230,9 +1284,14 @@ function guardarConfiguracion() {
     .getElementById("configMoneda")
     .value
     .trim();
-const perfil = document
-  .getElementById("configPerfilTaller")
-  .value;
+
+  const perfil = document
+    .getElementById("configPerfilTaller")
+    .value;
+
+  const vistaPrevia = document.getElementById("vistaPreviaLogoTaller");
+  const logoActual = localStorage.getItem("logoTaller") || "";
+
   localStorage.setItem(
     "nombreTaller",
     nombre || "Taller de Rebobinado"
@@ -1242,13 +1301,30 @@ const perfil = document
     "monedaSimbolo",
     moneda || "Q"
   );
-localStorage.setItem(
-  "perfilTaller",
-  perfil || "motores-electricos"
-);
-render();
-cerrarConfiguracion();
+
+  localStorage.setItem(
+    "perfilTaller",
+    perfil || "motores-electricos"
+  );
+
+  if (!vistaPrevia.hidden && vistaPrevia.src) {
+    try {
+      localStorage.setItem("logoTaller", vistaPrevia.src);
+    } catch (error) {
+      alert(
+        "No se pudo guardar el logotipo. La imagen puede ser demasiado grande " +
+        "para el almacenamiento disponible."
+      );
+      return;
+    }
+  } else if (logoActual) {
+    localStorage.setItem("logoTaller", logoActual);
+  }
+
+  render();
+  cerrarConfiguracion();
 }
+
 function fmtFecha(iso) {
   const d = new Date(iso);
   return d.toLocaleDateString("es-GT", { day: "2-digit", month: "short" });
@@ -3502,6 +3578,58 @@ on("btnSave", "onclick", guardar);
 on("btnConfiguracion", "onclick", abrirConfiguracion);
 on("btnCancelarConfiguracion", "onclick", cerrarConfiguracion);
 on("btnGuardarConfiguracion", "onclick", guardarConfiguracion);
+
+on("btnQuitarLogoTaller", "onclick", () => {
+  localStorage.removeItem("logoTaller");
+
+  const archivoLogo = document.getElementById("configLogoTaller");
+  const vistaPrevia = document.getElementById("vistaPreviaLogoTaller");
+
+  if (archivoLogo) {
+    archivoLogo.value = "";
+  }
+
+  if (vistaPrevia) {
+    vistaPrevia.removeAttribute("src");
+    vistaPrevia.hidden = true;
+  }
+
+  renderLogoTaller();
+});
+
+
+document.getElementById("configLogoTaller").addEventListener("change", (evento) => {
+  const archivo = evento.target.files[0];
+  const vistaPrevia = document.getElementById("vistaPreviaLogoTaller");
+
+  if (!archivo) return;
+
+  if (!archivo.type.startsWith("image/")) {
+    alert("Selecciona un archivo de imagen válido.");
+    evento.target.value = "";
+    return;
+  }
+
+  if (archivo.size > 5 * 1024 * 1024) {
+    alert("La imagen debe pesar menos de 5 MB.");
+    evento.target.value = "";
+    return;
+  }
+
+  const lector = new FileReader();
+
+  lector.onload = () => {
+    vistaPrevia.src = lector.result;
+    vistaPrevia.hidden = false;
+  };
+
+  lector.onerror = () => {
+    alert("No se pudo leer la imagen seleccionada.");
+  };
+
+  lector.readAsDataURL(archivo);
+});
+
 on("search", "oninput", (e) => { busqueda = e.target.value; render(); });
 on("btnCatalogo", "onclick", abrirCatalogo);
 on("btnClientes", "onclick", () => {
