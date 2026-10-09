@@ -3924,41 +3924,65 @@ render();
         }
 
        
+        
         const transaccion = database.transaction(
           ["ordenes", "materiales", "clientes"],
           "readwrite"
         );
 
-        try {
-          for (const [nombre, registros] of colecciones) {
-            const almacen = transaccion.objectStore(nombre);
+        const resultadoTransaccion = new Promise((resolve, reject) => {
+          transaccion.oncomplete = () => resolve();
 
-            for (const registro of registros) {
-              almacen.put(registro);
+          transaccion.onerror = () => {
+            reject(
+              transaccion.error ||
+              new Error("Error al guardar el respaldo")
+            );
+          };
+
+          transaccion.onabort = () => {
+            reject(
+              transaccion.error ||
+              new Error("La restauración fue cancelada")
+            );
+          };
+        });
+
+       
+        try {
+          try {
+            for (const [nombre, registros] of colecciones) {
+              const almacen = transaccion.objectStore(nombre);
+
+              for (const registro of registros) {
+                almacen.put(registro);
+              }
             }
+          } catch (errorPuesta) {
+            try {
+              transaccion.abort();
+            } catch (errorAbortar) {
+              console.error(
+                "No se pudo cancelar la transacción:",
+                errorAbortar
+              );
+            }
+
+            throw errorPuesta;
           }
 
-          await new Promise((resolve, reject) => {
-            transaccion.oncomplete = () => resolve();
+          await resultadoTransaccion;
 
-            transaccion.onerror = () => {
-              reject(
-                transaccion.error ||
-                new Error("Error al guardar el respaldo")
-              );
-            };
-
-            transaccion.onabort = () => {
-              reject(
-                transaccion.error ||
-                new Error("La restauración fue cancelada")
-              );
-            };
-          });
-
-          await emitir("ordenes");
-          await emitir("materiales");
-          await emitir("clientes");
+          try {
+            await emitir("ordenes");
+            await emitir("materiales");
+            await emitir("clientes");
+          } catch (errorVista) {
+            console.error(
+              "Los datos se guardaron, pero hubo un error al actualizar la vista:",
+              errorVista
+            );
+          }
 
           alert(
             "Respaldo restaurado correctamente.\n\n" +
@@ -3976,6 +4000,8 @@ render();
             "\n\nNo vuelvas a intentarlo hasta verificar los datos."
           );
         }
+
+         
 
       } catch (error) {
         console.error("Error validando respaldo:", error);
