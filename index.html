@@ -411,7 +411,7 @@ style="width:140px;height:76px;max-width:38vw;object-fit:contain;object-position
   <label>Facturación final (<span id="monedaFacturacion">Q</span>)</label>
   <input
     id="f-facturacion-final"
-    type="number"
+    type="text"
     inputmode="decimal"
     placeholder="0"
     step="0.01"
@@ -3330,11 +3330,14 @@ async function guardar() {
       total:
         Number(document.getElementById("f-total").value) || 0,
 
-      facturacionFinal:
-        Number(
-          document.getElementById("f-facturacion-final").value
-        ) || 0,
+     facturacionFinal: (() => {
+  const valor = document
+    .getElementById("f-facturacion-final")
+    .value.trim()
+    .replace(/,/g, "");
 
+  return Number(valor) || 0;
+})(),
       notas:
         document.getElementById("f-notas").value.trim(),
 
