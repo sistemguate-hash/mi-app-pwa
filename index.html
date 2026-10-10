@@ -3353,11 +3353,16 @@ const { jsPDF } = window.jspdf;
 const doc = new jsPDF();
 let y = 20;
 
+
 const logoGuardado = localStorage.getItem("logoTaller") || "";
+let logoInsertado = false;
 
 if (logoGuardado) {
   try {
-    const formatoLogo = logoGuardado.match(/^data:image\/(png|jpeg|webp);base64,/i);
+    const formatoLogo = logoGuardado.match(
+      /^data:image\/(png|jpeg|webp);base64,/i
+    );
+
     if (formatoLogo) {
       const tipoImagen = formatoLogo[1].toLowerCase();
       const formatoPDF = tipoImagen === "png" ? "PNG" : "JPEG";
@@ -3366,10 +3371,12 @@ if (logoGuardado) {
         logoGuardado,
         formatoPDF,
         14,
-        10,
+        12,
         32,
         20
       );
+
+      logoInsertado = true;
     }
   } catch (errorLogoPDF) {
     console.warn("No se pudo insertar el logotipo en el PDF:", errorLogoPDF);
@@ -3378,11 +3385,18 @@ if (logoGuardado) {
 
 doc.setFont("helvetica", "bold");
 doc.setFontSize(16);
-doc.text("Orden de trabajo — " + obtenerNombreTaller(), 50, 20);
-y = 30;
+
+const tituloPDF = "Orden de trabajo — " + obtenerNombreTaller();
+const anchoTitulo = logoInsertado ? 140 : 182;
+const lineasTitulo = doc.splitTextToSize(tituloPDF, anchoTitulo);
+
+doc.text(lineasTitulo, logoInsertado ? 52 : 14, 18);
+
+y = Math.max(34, 18 + lineasTitulo.length * 7 + 4);
 
 doc.setFontSize(11);
 doc.setFont("helvetica", "normal");
+
 doc.text(
   "ORD-" + ordenNumero(o.id) +
   "   ·   Ingreso: " + fmtFecha(o.fechaIngreso) +
@@ -3390,11 +3404,13 @@ doc.text(
   14,
   y
 );
+
 y += 10;
 
 doc.setDrawColor(180);
 doc.line(14, y, 196, y);
 y += 8;
+
 
 
    
