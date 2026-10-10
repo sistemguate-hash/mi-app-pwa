@@ -3183,7 +3183,8 @@ document.getElementById("f-telefono").value = o.telefono || "";
 cargarValoresCamposTecnicos(o);
 document.getElementById("f-falla").value = o.falla || "";
   document.getElementById("f-horas").value = o.horas || "";
-document.getElementById("f-tarifa").value = o.tarifa || "";
+document.getElementById("f-tarifa").value =
+  o.tarifa != null ? String(o.tarifa).replace(",", ".") : "";
 document.getElementById("f-margen").value =
   o.margen != null ? String(o.margen).replace(",", ".") : "";
 document.getElementById("f-total").value =
