@@ -18,6 +18,7 @@
   --text: #1C2126;
   --text-dim: #6B7480;
   --accent: #B5622E;
+  --color-botones: #014BA0;
   --accent-soft: #F0DCC9;
   --green: #4B7A63;
   --green-soft: #DCE8E0;
@@ -96,7 +97,7 @@ input[type=text], input[type=search] {
 .pill.active { background: var(--text); color: var(--bg); border-color: var(--text); }
 button { font-family: inherit; cursor: pointer; }
  .btn-new {
-  background: var(--accent); color: #fff; border: none; border-radius: 9px;
+  background: var(--color-botones); color: #fff; border: none; border-radius: 9px;
   padding: 10px 16px; font-size: 14px; font-weight: 600; width: 100%; margin-bottom: 16px;
 }
 .btn-new:active { opacity: 0.85; }
@@ -151,7 +152,7 @@ select {
 .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .sheet-actions { display: flex; gap: 10px; margin-top: 14px; }
 .btn-primary {
-  background: var(--accent); color: #fff; border: none; border-radius: 9px;
+ background: var(--color-botones);  color: #fff; border: none; border-radius: 9px;
   padding: 11px; font-size: 14.5px; font-weight: 600; flex: 1;
 }
 .btn-cancel {
@@ -616,6 +617,31 @@ style="width:140px;height:76px;max-width:38vw;object-fit:contain;object-position
 </div>
 
 
+<div class="field">
+  <label for="configColorBotones">Color de los botones principales</label>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <input
+      id="configColorBotones"
+      type="color"
+      value="#014BA0"
+      style="width:64px;height:42px;padding:3px;flex:0 0 auto;"
+    >
+    <span id="vistaPreviaColorBotones" style="font-size:13px;color:var(--text-dim);">
+      Azul corporativo
+    </span>
+  </div>
+  <button
+    type="button"
+    id="btnRestaurarColorBotones"
+    class="btn-cancel"
+    style="margin-top:8px;width:auto;"
+  >
+    Restaurar color predeterminado
+  </button>
+</div>
+
+
+
     
 <div class="sheet-actions" style="margin-top:14px;">
   <button
@@ -706,6 +732,34 @@ function renderNombreTaller() {
 
   renderLogoTaller();
 }
+
+function cargarColorBotones() {
+  const colorGuardado = localStorage.getItem("colorBotones");
+  const colorValido =
+    colorGuardado && /^#[0-9A-Fa-f]{6}$/.test(colorGuardado)
+      ? colorGuardado
+      : "#014BA0";
+
+  document.documentElement.style.setProperty(
+    "--color-botones",
+    colorValido
+  );
+
+  const selector = document.getElementById("configColorBotones");
+  const vistaPrevia = document.getElementById("vistaPreviaColorBotones");
+
+  if (selector) {
+    selector.value = colorValido;
+  }
+
+  if (vistaPrevia) {
+    vistaPrevia.textContent =
+      colorValido.toUpperCase() === "#014BA0"
+        ? "Azul corporativo"
+        : colorValido.toUpperCase();
+  }
+}
+
 
 function renderLogoTaller() {
   const logo = document.getElementById("logoTaller");
@@ -1364,6 +1418,20 @@ function guardarConfiguracion() {
     "perfilTaller",
     perfil || "motores-electricos"
   );
+  
+const selectorColor = document.getElementById("configColorBotones");
+const colorElegido = selectorColor
+  ? selectorColor.value
+  : "#014BA0";
+
+if (/^#[0-9A-Fa-f]{6}$/.test(colorElegido)) {
+  localStorage.setItem("colorBotones", colorElegido);
+  document.documentElement.style.setProperty(
+    "--color-botones",
+    colorElegido
+  );
+}
+
 
   if (!vistaPrevia.hidden && vistaPrevia.src) {
     try {
@@ -3693,6 +3761,35 @@ on("btnConfiguracion", "onclick", abrirConfiguracion);
 on("btnCancelarConfiguracion", "onclick", cerrarConfiguracion);
 on("btnGuardarConfiguracion", "onclick", guardarConfiguracion);
 
+on("configColorBotones", "onchange", () => {
+  const selector = document.getElementById("configColorBotones");
+  const vistaPrevia = document.getElementById("vistaPreviaColorBotones");
+
+  if (!selector) return;
+
+  if (vistaPrevia) {
+    vistaPrevia.textContent = selector.value.toUpperCase();
+  }
+});
+
+
+on("btnRestaurarColorBotones", "onclick", () => {
+  const colorPredeterminado = "#014BA0";
+  const selector = document.getElementById("configColorBotones");
+  const vistaPrevia = document.getElementById("vistaPreviaColorBotones");
+
+  if (selector) selector.value = colorPredeterminado;
+  if (vistaPrevia) vistaPrevia.textContent = "Azul corporativo";
+
+  localStorage.setItem("colorBotones", colorPredeterminado);
+  document.documentElement.style.setProperty(
+    "--color-botones",
+    colorPredeterminado
+  );
+});
+
+
+
 on("btnQuitarLogoTaller", "onclick", () => {
   localStorage.removeItem("logoTaller");
 
@@ -3802,7 +3899,7 @@ on("f-tarifa", "oninput", () => {
 on("f-margen", "oninput", actualizarTotalPresupuesto);
 
 render();
-
+cargarColorBotones();
 // BASE DE DATOS LOCAL - IndexedDB
 (async function initDb() {
   try {
