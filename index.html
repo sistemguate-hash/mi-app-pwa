@@ -1451,9 +1451,14 @@ if (/^#[0-9A-Fa-f]{6}$/.test(colorElegido)) {
   cerrarConfiguracion();
 }
 
+
 function fmtFecha(iso) {
   const d = new Date(iso);
-  return d.toLocaleDateString("es-GT", { day: "2-digit", month: "short" });
+  return d.toLocaleDateString("es-GT", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric"
+  });
 }
 
 function ordenNumero(id) {
