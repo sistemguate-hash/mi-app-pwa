@@ -378,7 +378,7 @@ style="width:140px;height:76px;max-width:38vw;object-fit:contain;object-position
 </div>
    
     <div id="camposTecnicos"></div>
-    <div class="field"><label>Falla reportada</label><textarea id="f-falla" placeholder="Descripción del problema"></textarea></div>
+   
     <div class="field">
       <label>Materiales usados</label>
       <div id="itemsMateriales"></div>
@@ -815,10 +815,11 @@ function renderCamposTecnicos(perfilId = null) {
       const requerido = campo.obligatorio ? "required" : "";
 
       const esMultilinea = [
-        "diagnostico",
-        "trabajoRealizado",
-        "observaciones"
-      ].includes(campo.id);
+  "diagnostico",
+  "trabajoRealizado",
+  "observaciones",
+  "falla"
+].includes(campo.id);
 
       if (campo.tipo === "select") {
         const opciones = (campo.opciones || [])
@@ -1002,11 +1003,17 @@ const PERFILES_TALLER = {
       obligatorio: false
     },
     {
-      id: "observaciones",
-      nombre: "Observaciones",
-      tipo: "text",
-      obligatorio: false
-    }
+  id: "observaciones",
+  nombre: "Observaciones",
+  tipo: "text",
+  obligatorio: false
+},
+{
+  id: "falla",
+  nombre: "Falla reportada",
+  tipo: "text",
+  obligatorio: false
+}
   ]
 },
 
@@ -3319,7 +3326,7 @@ async function guardar() {
 
       ...obtenerValoresCamposTecnicos(ordenExistente),
 
-      falla: document.getElementById("f-falla").value.trim(),
+      falla: document.getElementById("f-falla")?.value.trim() || "",
       materiales: materialesTotal(),
       materialesItems: itemsActuales,
 
