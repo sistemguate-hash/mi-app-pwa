@@ -3761,7 +3761,7 @@ on("btnConfiguracion", "onclick", abrirConfiguracion);
 on("btnCancelarConfiguracion", "onclick", cerrarConfiguracion);
 on("btnGuardarConfiguracion", "onclick", guardarConfiguracion);
 
-on("configColorBotones", "onchange", () => {
+on("configColorBotones", "oninput", () => {
   const selector = document.getElementById("configColorBotones");
   const vistaPrevia = document.getElementById("vistaPreviaColorBotones");
 
@@ -3773,6 +3773,7 @@ on("configColorBotones", "onchange", () => {
 });
 
 
+
 on("btnRestaurarColorBotones", "onclick", () => {
   const colorPredeterminado = "#014BA0";
   const selector = document.getElementById("configColorBotones");
@@ -3780,13 +3781,8 @@ on("btnRestaurarColorBotones", "onclick", () => {
 
   if (selector) selector.value = colorPredeterminado;
   if (vistaPrevia) vistaPrevia.textContent = "Azul corporativo";
-
-  localStorage.setItem("colorBotones", colorPredeterminado);
-  document.documentElement.style.setProperty(
-    "--color-botones",
-    colorPredeterminado
-  );
 });
+
 
 
 
