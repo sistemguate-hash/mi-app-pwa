@@ -989,7 +989,12 @@ const PERFILES_TALLER = {
   tipo: "text",
   obligatorio: false
 },
-    
+    {
+  id: "falla",
+  nombre: "Falla reportada",
+  tipo: "text",
+  obligatorio: false
+},
     {
       id: "diagnostico",
       nombre: "Diagnóstico técnico",
@@ -1008,12 +1013,6 @@ const PERFILES_TALLER = {
   tipo: "text",
   obligatorio: false
 },
-{
-  id: "falla",
-  nombre: "Falla reportada",
-  tipo: "text",
-  obligatorio: false
-}
   ]
 },
 
@@ -2802,16 +2801,7 @@ ${camposTecnicosHtml}
       Diagnóstico
     </div>
 
-    <div class="cat-row" style="display:block;">
-      <strong>Falla reportada</strong>
-      <div style="
-        color:var(--text-dim);
-        margin-top:5px;
-        white-space:pre-wrap;
-      ">
-        ${escapeHtml(orden.falla || "Sin falla registrada")}
-      </div>
-    </div>
+    
 
     <div style="
       margin:16px 0 10px;
