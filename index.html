@@ -2984,7 +2984,11 @@ function renderItemsMateriales() {
       </div>
     `).join("");
     el.querySelectorAll(".chip-rm").forEach(btn => {
-      btn.onclick = () => { itemsActuales.splice(Number(btn.dataset.i), 1); renderItemsMateriales(); };
+    btn.onclick = () => {
+  itemsActuales.splice(Number(btn.dataset.i), 1);
+  renderItemsMateriales();
+  actualizarTotalPresupuesto();
+};  
     });
     el.querySelectorAll(".mat-cantidad").forEach(input => {
   input.onchange = () => {
