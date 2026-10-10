@@ -3499,12 +3499,14 @@ const campo = (label, valor) => {
   const altoLinea = 6;
   const margenInferior = 15;
 
-  const textoValor =
-    valor === undefined ||
-    valor === null ||
-    String(valor).trim() === ""
-      ? "—"
-      : String(valor);
+ const textoValor =
+  valor === undefined ||
+  valor === null ||
+  String(valor).trim() === ""
+    ? ""
+    : String(valor).trim();
+
+if (textoValor === "") return;
 
   doc.setFont("helvetica", "bold");
 
