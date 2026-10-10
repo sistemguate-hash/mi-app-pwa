@@ -3169,29 +3169,29 @@ function inicializarContadorOrdenes() {
     localStorage.getItem("ultimoNumeroOrden")
   );
 
-  if (
-    Number.isFinite(contadorActual) &&
-    contadorActual > 0
-  ) {
-    return;
-  }
-
   const numeros = ordenes
     .map(o => Number(o.numeroOrden))
-    .filter(
-      n => Number.isFinite(n) && n > 0
-    );
+    .filter(n => Number.isFinite(n) && n > 0);
 
-  const maximo = numeros.length
+  const maximoOrdenes = numeros.length
     ? Math.max(...numeros)
     : 0;
 
+  const contadorValido =
+    Number.isFinite(contadorActual) && contadorActual > 0
+      ? contadorActual
+      : 0;
+
+  const contadorFinal = Math.max(
+    contadorValido,
+    maximoOrdenes
+  );
+
   localStorage.setItem(
     "ultimoNumeroOrden",
-    String(maximo)
+    String(contadorFinal)
   );
 }
-
 async function guardar() {
   try {
     const clienteId = document.getElementById("f-cliente").value;
