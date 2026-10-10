@@ -3184,10 +3184,14 @@ cargarValoresCamposTecnicos(o);
 document.getElementById("f-falla").value = o.falla || "";
   document.getElementById("f-horas").value = o.horas || "";
 document.getElementById("f-tarifa").value = o.tarifa || "";
-document.getElementById("f-margen").value = o.margen || "";
-document.getElementById("f-total").value = o.total || "";
+document.getElementById("f-margen").value =
+  o.margen != null ? String(o.margen).replace(",", ".") : "";
+document.getElementById("f-total").value =
+  o.total != null ? String(o.total).replace(",", ".") : "";
 document.getElementById("f-facturacion-final").value =
-  o.facturacionFinal ?? 0;
+  o.facturacionFinal != null
+    ? String(o.facturacionFinal).replace(",", ".")
+    : 0;
 actualizarManoObra();
 document.getElementById("f-notas").value = o.notas || "";
 
