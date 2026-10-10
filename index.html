@@ -793,7 +793,8 @@ function renderEtiquetasMoneda() {
 }
 
 
- function renderCamposTecnicos(perfilId = null) {
+ 
+function renderCamposTecnicos(perfilId = null) {
   const contenedor = document.getElementById("camposTecnicos");
   if (!contenedor) return;
 
@@ -809,20 +810,60 @@ function renderEtiquetasMoneda() {
     return;
   }
 
- contenedor.innerHTML = perfil.campos
- 
-  .map(campo => {
+  contenedor.innerHTML = perfil.campos
+    .map(campo => {
+      const requerido = campo.obligatorio ? "required" : "";
 
-    const requerido = campo.obligatorio ? "required" : "";
+      const esMultilinea = [
+        "diagnostico",
+        "trabajoRealizado",
+        "observaciones"
+      ].includes(campo.id);
 
-    if (campo.tipo === "select") {
-      const opciones = (campo.opciones || [])
-        .map(opcion => `
-          <option value="${escapeHtml(opcion)}">
-            ${escapeHtml(opcion)}
-          </option>
-        `)
-        .join("");
+      if (campo.tipo === "select") {
+        const opciones = (campo.opciones || [])
+          .map(opcion => `
+            <option value="${escapeHtml(opcion)}">
+              ${escapeHtml(opcion)}
+            </option>
+          `)
+          .join("");
+
+        return `
+          <div class="field">
+            <label>
+              ${escapeHtml(campo.nombre)}
+              ${campo.obligatorio ? " *" : ""}
+            </label>
+
+            <select
+              id="f-${escapeHtml(campo.id)}"
+              ${requerido}
+            >
+              <option value="">Seleccionar...</option>
+              ${opciones}
+            </select>
+          </div>
+        `;
+      }
+
+      if (esMultilinea) {
+        return `
+          <div class="field">
+            <label>
+              ${escapeHtml(campo.nombre)}
+              ${campo.obligatorio ? " *" : ""}
+            </label>
+
+            <textarea
+              id="f-${escapeHtml(campo.id)}"
+              ${requerido}
+              placeholder="${escapeHtml(campo.nombre)}"
+              rows="4"
+            ></textarea>
+          </div>
+        `;
+      }
 
       return `
         <div class="field">
@@ -831,35 +872,19 @@ function renderEtiquetasMoneda() {
             ${campo.obligatorio ? " *" : ""}
           </label>
 
-          <select
+          <input
             id="f-${escapeHtml(campo.id)}"
+            type="${campo.tipo === "number" ? "number" : "text"}"
+            ${campo.tipo === "number" ? 'step="0.01"' : ""}
             ${requerido}
+            placeholder="${escapeHtml(campo.nombre)}"
           >
-            <option value="">Seleccionar...</option>
-            ${opciones}
-          </select>
         </div>
       `;
-    }
-
-    return `
-      <div class="field">
-        <label>
-          ${escapeHtml(campo.nombre)}
-          ${campo.obligatorio ? " *" : ""}
-        </label>
-
-        <input
-          id="f-${escapeHtml(campo.id)}"
-          type="${campo.tipo === "number" ? "number" : "text"}"
-          ${campo.tipo === "number" ? 'step="0.01"' : ""}
-          ${requerido}
-          placeholder="${escapeHtml(campo.nombre)}"
-        >
-      </div>
-    `;
-  }).join("");
+    })
+    .join("");
 }
+
 // ============================================================
 // PERFILES TÉCNICOS DE TALLER
 // ============================================================
@@ -936,18 +961,14 @@ const PERFILES_TALLER = {
       obligatorio: false,
       opciones: ["1", "3", "Otra"]
     },
-    {
-      id: "corriente",
-      nombre: "Corriente",
-      tipo: "number",
-      obligatorio: false
-    },
-    {
-      id: "factorPotencia",
-      nombre: "Factor de potencia",
-      tipo: "number",
-      obligatorio: false
-    },
+  
+   {
+  id: "corriente",
+  nombre: "Amperios",
+  tipo: "number",
+  obligatorio: false
+},
+   
     {
       id: "rpm",
       nombre: "RPM",
@@ -962,21 +983,11 @@ const PERFILES_TALLER = {
       opciones: ["A", "B", "F", "H", "Otra"]
     },
     {
-      id: "gradoProteccion",
-      nombre: "Grado de protección",
-      tipo: "select",
-      obligatorio: false,
-      opciones: [
-        "IP20",
-        "IP21",
-        "IP23",
-        "IP44",
-        "IP54",
-        "IP55",
-        "IP65",
-        "Otra"
-      ]
-    },
+  id: "frame",
+  nombre: "Frame",
+  tipo: "text",
+  obligatorio: false
+},
     
     {
       id: "diagnostico",
