@@ -3610,15 +3610,21 @@ y += 8;
       });
       doc.setFontSize(11); y += 3;
     }
-    campo("Total materiales:", fmtQ(o.materiales));
+    if (o.materialesItems && o.materialesItems.length > 0) {
+  campo("Total materiales:", fmtQ(o.materiales));
+}
 
-campo(
-  "Mano de obra:",
-  (o.horas || 0) + " horas × " + fmtQ(o.tarifa || 0) + "/h = " +
-  fmtQ((o.horas || 0) * (o.tarifa || 0))
-);
+if (Number(o.horas) > 0 && Number(o.tarifa) > 0) {
+  campo(
+    "Mano de obra:",
+    o.horas + " horas × " + fmtQ(o.tarifa) + "/h = " +
+      fmtQ(o.horas * o.tarifa)
+  );
+}
 
-campo("Margen / adicional:", fmtQ(o.margen || 0));
+if (Number(o.margen) !== 0 && Number.isFinite(Number(o.margen))) {
+  campo("Margen / adicional:", fmtQ(o.margen));
+}
 
 
 const dibujarTotal = (etiqueta, valor) => {
@@ -3664,8 +3670,13 @@ const dibujarTotal = (etiqueta, valor) => {
   y += altoBloque + 2;
 };
 
-dibujarTotal("Total presupuesto:", fmtQ(o.total));
-dibujarTotal("Facturación final:", fmtQ(o.facturacionFinal ?? 0));
+if (Number(o.total) > 0) {
+  dibujarTotal("Total presupuesto:", fmtQ(o.total));
+}
+
+if (Number(o.facturacionFinal) > 0) {
+  dibujarTotal("Facturación final:", fmtQ(o.facturacionFinal));
+}
 
     if (o.notas) { doc.setFont("helvetica", "normal"); doc.text(doc.splitTextToSize("Notas: " + o.notas, 180), 14, y); y += 10; }
 if (o.fotos && o.fotos.length) {
