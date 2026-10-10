@@ -4047,6 +4047,27 @@ const respaldo = {
           return;
         }
 
+const configuracionRespaldo =
+  respaldo.configuracion && typeof respaldo.configuracion === "object"
+    ? respaldo.configuracion
+    : {};
+
+const logoRespaldo =
+  typeof configuracionRespaldo.logoTaller === "string"
+    ? configuracionRespaldo.logoTaller
+    : "";
+
+if (
+  logoRespaldo &&
+  !/^data:image\/(png|jpeg|webp);base64,/i.test(logoRespaldo)
+) {
+  alert(
+    "El logotipo del respaldo no tiene un formato válido. " +
+    "No se modificó ningún dato."
+  );
+  return;
+}
+
         const colecciones = [
           ["ordenes", respaldo.datos.ordenes],
           ["materiales", respaldo.datos.materiales],
@@ -4174,6 +4195,22 @@ const respaldo = {
               errorVista
             );
           }
+
+if (logoRespaldo) {
+  try {
+    localStorage.setItem("logoTaller", logoRespaldo);
+  } catch (errorLogo) {
+    console.error("No se pudo restaurar el logotipo:", errorLogo);
+    alert(
+      "Los datos se restauraron correctamente, pero no se pudo " +
+      "guardar el logotipo. Puedes volver a configurarlo manualmente."
+    );
+  }
+} else if (configuracionRespaldo.logoTaller === "") {
+  localStorage.removeItem("logoTaller");
+}
+
+renderLogoTaller();
 
           alert(
             "Respaldo restaurado correctamente.\n\n" +
