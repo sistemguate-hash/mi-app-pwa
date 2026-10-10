@@ -3969,16 +3969,21 @@ render();
         const materialesRespaldo = await obtenerTodos(database, "materiales");
         const clientesRespaldo = await obtenerTodos(database, "clientes");
 
-        const respaldo = {
-          aplicacion: "mi-app-pwa",
-          versionFormato: 1,
-          fechaExportacion: new Date().toISOString(),
-          datos: {
-            ordenes: ordenesRespaldo,
-            materiales: materialesRespaldo,
-            clientes: clientesRespaldo
-          }
-        };
+       
+const respaldo = {
+  aplicacion: "mi-app-pwa",
+  versionFormato: 1,
+  fechaExportacion: new Date().toISOString(),
+  configuracion: {
+    logoTaller: localStorage.getItem("logoTaller") || ""
+  },
+  datos: {
+    ordenes: ordenesRespaldo,
+    materiales: materialesRespaldo,
+    clientes: clientesRespaldo
+  }
+};
+
 
         const contenido = JSON.stringify(respaldo, null, 2);
         const archivo = new Blob(
