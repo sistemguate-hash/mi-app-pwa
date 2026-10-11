@@ -3641,6 +3641,21 @@ perfilOrden.campos.forEach(campoPerfil => {
   
 let valorMostrar = String(valor);
 
+
+if (campoPerfil.id === "kilometraje") {
+  const kilometraje = Number(
+    String(valor).replace(/[,.]/g, "")
+  );
+
+  if (Number.isFinite(kilometraje)) {
+    valorMostrar = kilometraje.toLocaleString("en-US", {
+      maximumFractionDigits: 0,
+      useGrouping: true
+    });
+  }
+}
+
+
 const camposMedidaDecimal = [
   "espesor",
   "diametro",
