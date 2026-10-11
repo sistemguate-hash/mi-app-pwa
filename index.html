@@ -4248,9 +4248,15 @@ const respaldo = {
   aplicacion: "mi-app-pwa",
   versionFormato: 1,
   fechaExportacion: new Date().toISOString(),
-  configuracion: {
-    logoTaller: localStorage.getItem("logoTaller") || ""
-  },
+ 
+configuracion: {
+  nombreTaller: localStorage.getItem("nombreTaller") || "",
+  monedaSimbolo: localStorage.getItem("monedaSimbolo") || "Q",
+  colorBotones: localStorage.getItem("colorBotones") || "#014BA0",
+  logoTaller: localStorage.getItem("logoTaller") || "",
+  perfilTaller: localStorage.getItem("perfilTaller") || "motores-electricos"
+},
+
   datos: {
     ordenes: ordenesRespaldo,
     materiales: materialesRespaldo,
@@ -4341,7 +4347,37 @@ if (
   );
   return;
 }
+const colorRespaldo = configuracionRespaldo.colorBotones;
+if (
+  typeof colorRespaldo === "string" &&
+  colorRespaldo !== "" &&
+  !/^#[0-9A-Fa-f]{6}$/.test(colorRespaldo)
+) {
+  alert(
+    "El color de botones del respaldo no es válido. " +
+    "No se modificó ningún dato."
+  );
+  return;
+}
 
+const perfilRespaldo = configuracionRespaldo.perfilTaller;
+if (
+  typeof perfilRespaldo === "string" &&
+  perfilRespaldo !== "" &&
+  (
+    typeof PERFILES_TALLER === "undefined" ||
+    !Object.prototype.hasOwnProperty.call(
+      PERFILES_TALLER,
+      perfilRespaldo
+    )
+  )
+) {
+  alert(
+    "El perfil del taller del respaldo no es válido. " +
+    "No se modificó ningún dato."
+  );
+  return;
+}
         const colecciones = [
           ["ordenes", respaldo.datos.ordenes],
           ["materiales", respaldo.datos.materiales],
@@ -4395,19 +4431,42 @@ if (
           );
         }
 
-        const confirmado = confirm(
-          "Respaldo válido: " + archivo.name + "\n\n" +
-          resumen.join("\n") + "\n\n" +
-          "La restauración combinará los registros del archivo " +
-          "con los actuales. Los registros actuales que no estén " +
-          "en el respaldo se conservarán.\n\n" +
-          "¿Deseas continuar con esta restauración?"
-        );
+        
+const modoElegido = prompt(
+  "RESPALDO VÁLIDO: " + archivo.name + "\n\n" +
+  resumen.join("\n") + "\n\n" +
+  "Escribe una opción:\n\n" +
+  "COMBINAR: agrega registros nuevos y actualiza " +
+  "los que tengan el mismo ID.\n\n" +
+  "REEMPLAZAR: sustituye las órdenes, materiales " +
+  "y clientes actuales por los del respaldo.\n\n" +
+  "Escribe COMBINAR o REEMPLAZAR."
+);
 
-        if (!confirmado) {
-          alert("Operación cancelada. No se modificó ningún dato.");
-          return;
-        }
+const modoRestauracion = String(modoElegido || "")
+  .trim()
+  .toUpperCase();
+
+if (!["COMBINAR", "REEMPLAZAR"].includes(modoRestauracion)) {
+  alert("Restauración cancelada. No se modificó ningún dato.");
+  return;
+}
+
+const confirmado = confirm(
+  "Modo seleccionado: " + modoRestauracion + "\n\n" +
+  (modoRestauracion === "REEMPLAZAR"
+    ? "ATENCIÓN: se eliminarán los registros actuales " +
+      "de las tres colecciones y se sustituirán por " +
+      "los del respaldo."
+    : "Se combinarán los registros. Los actuales que " +
+      "no estén en el respaldo se conservarán.") +
+  "\n\n¿Deseas continuar?"
+);
+
+if (!confirmado) {
+  alert("Operación cancelada. No se modificó ningún dato.");
+  return;
+}
 
        
         
@@ -4437,13 +4496,19 @@ if (
        
         try {
           try {
-            for (const [nombre, registros] of colecciones) {
-              const almacen = transaccion.objectStore(nombre);
+           
+for (const [nombre, registros] of colecciones) {
+  const almacen = transaccion.objectStore(nombre);
 
-              for (const registro of registros) {
-                almacen.put(registro);
-              }
-            }
+  if (modoRestauracion === "REEMPLAZAR") {
+    almacen.clear();
+  }
+
+  for (const registro of registros) {
+    almacen.put(registro);
+  }
+}
+
           } catch (errorPuesta) {
             try {
               transaccion.abort();
@@ -4470,29 +4535,82 @@ if (
             );
           }
 
-if (logoRespaldo) {
-  try {
-    localStorage.setItem("logoTaller", logoRespaldo);
-  } catch (errorLogo) {
-    console.error("No se pudo restaurar el logotipo:", errorLogo);
-    alert(
-      "Los datos se restauraron correctamente, pero no se pudo " +
-      "guardar el logotipo. Puedes volver a configurarlo manualmente."
-    );
+const configuracionesNuevas = {};
+
+for (const clave of [
+  "nombreTaller",
+  "monedaSimbolo",
+  "colorBotones",
+  "perfilTaller",
+  "logoTaller"
+]) {
+  const valor = configuracionRespaldo[clave];
+
+  if (typeof valor === "string") {
+    configuracionesNuevas[clave] = valor;
   }
-} else if (configuracionRespaldo.logoTaller === "") {
-  localStorage.removeItem("logoTaller");
+}
+const clavesConfiguracion = [
+  "nombreTaller",
+  "monedaSimbolo",
+  "colorBotones",
+  "perfilTaller",
+  "logoTaller"
+];
+
+
+let configuracionesRestauradas = true;
+
+try {
+  for (const clave of clavesConfiguracion) {
+    if (
+      Object.prototype.hasOwnProperty.call(
+        configuracionRespaldo,
+        clave
+      )
+    ) {
+      const valor = configuracionesNuevas[clave];
+
+      if (typeof valor === "string") {
+        localStorage.setItem(clave, valor);
+      }
+    }
+  }
+} catch (errorConfiguracion) {
+  configuracionesRestauradas = false;
+
+  console.error(
+    "No se pudieron restaurar todas las configuraciones:",
+    errorConfiguracion
+  );
 }
 
+
+renderNombreTaller();
+renderEtiquetasMoneda();
+cargarColorBotones();
 renderLogoTaller();
 
-          alert(
-            "Respaldo restaurado correctamente.\n\n" +
-            "Órdenes procesadas: " + respaldo.datos.ordenes.length + "\n" +
-            "Materiales procesados: " + respaldo.datos.materiales.length + "\n" +
-            "Clientes procesados: " + respaldo.datos.clientes.length + "\n\n" +
-            "Los registros actuales que no estaban en el respaldo se conservaron."
-          );
+       
+alert(
+  "Respaldo restaurado correctamente.\n\n" +
+  "Modo: " + modoRestauracion + "\n" +
+  "Órdenes procesadas: " + respaldo.datos.ordenes.length + "\n" +
+  "Materiales procesados: " + respaldo.datos.materiales.length + "\n" +
+  "Clientes procesados: " + respaldo.datos.clientes.length + "\n\n" +
+  (
+    modoRestauracion === "COMBINAR"
+      ? "Los registros actuales que no estaban en el respaldo se conservaron."
+      : "Las tres colecciones fueron sustituidas por los datos del respaldo."
+  ) +
+  "\n\n" +
+  (
+    configuracionesRestauradas
+      ? "Configuraciones del taller restauradas."
+      : "ATENCIÓN: Los datos se restauraron, pero algunas configuraciones no pudieron guardarse. Revísalas manualmente."
+  )
+);
+
         } catch (error) {
           console.error("Error restaurando respaldo:", error);
 
