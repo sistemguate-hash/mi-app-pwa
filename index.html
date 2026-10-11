@@ -3113,14 +3113,13 @@ if (valor === undefined || valor === null) {
     "alto"
   ];
 
-  if (
-    camposMedida.includes(campo.id) &&
-    el.type === "number"
-  ) {
-    el.value = String(valor).replace(",", ".");
-  } else {
-    el.value = valor;
-  }
+  
+if (camposMedida.includes(campo.id)) {
+  el.value = String(valor).replace(",", ".");
+} else {
+  el.value = valor;
+}
+
 }
 
   });
