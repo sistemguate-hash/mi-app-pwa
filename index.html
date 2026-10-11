@@ -1765,6 +1765,7 @@ function render() {
   renderEtiquetasMoneda();
 }
 
+
 function cambiarVista(nuevaVista) {
   vistaActual = nuevaVista;
 
@@ -1782,16 +1783,13 @@ function cambiarVista(nuevaVista) {
 
   btnLista.classList.toggle("active", esLista);
   btnKanban.classList.toggle("active", !esLista);
+
+  if (esLista) {
+    renderList();
+  } else {
+    renderKanban();
+  }
 }
-
-document.getElementById("btnVistaLista").addEventListener("click", () => {
-  cambiarVista("lista");
-});
-
-document.getElementById("btnVistaKanban").addEventListener("click", () => {
-  cambiarVista("kanban");
-});
-
 
 function renderStats() {
   const enTaller = ordenes.filter(o => !["Listo","Entregado"].includes(o.estado)).length;
