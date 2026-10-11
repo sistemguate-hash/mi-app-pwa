@@ -814,9 +814,18 @@ function renderCamposTecnicos(perfilId = null) {
     .map(campo => {
       const requerido = campo.obligatorio ? "required" : "";
       
+
 const esMedidaDecimalHerreria =
   perfilSeleccionado === "herreria" &&
   ["espesor", "largo", "ancho", "alto"].includes(campo.id);
+
+const esMedidaDecimalTorno =
+  perfilSeleccionado === "torno-industrial" &&
+  ["diametro", "longitud", "tolerancia", "diametroInterior"].includes(campo.id);
+
+const esMedidaDecimal =
+  esMedidaDecimalHerreria || esMedidaDecimalTorno;
+
 
 
       const esMultilinea = [
@@ -872,7 +881,7 @@ const esMedidaDecimalHerreria =
       }
 
     
-const tipoInput = esMedidaDecimalHerreria
+const tipoInput = esMedidaDecimal
   ? "text"
   : campo.tipo === "number"
     ? "number"
@@ -888,8 +897,8 @@ return `
     <input
       id="f-${escapeHtml(campo.id)}"
       type="${tipoInput}"
-      ${esMedidaDecimalHerreria ? 'inputmode="decimal"' : ""}
-      ${campo.tipo === "number" && !esMedidaDecimalHerreria ? 'step="0.01"' : ""}
+      ${esMedidaDecimal ? 'inputmode="decimal"' : ""}
+      ${campo.tipo === "number" && !esMedidaDecimal ? 'step="0.01"' : ""}
       ${requerido}
       placeholder="${escapeHtml(campo.nombre)}"
     >
