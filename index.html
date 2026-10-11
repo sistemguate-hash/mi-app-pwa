@@ -813,6 +813,11 @@ function renderCamposTecnicos(perfilId = null) {
   contenedor.innerHTML = perfil.campos
     .map(campo => {
       const requerido = campo.obligatorio ? "required" : "";
+      
+const esMedidaDecimalHerreria =
+  perfilSeleccionado === "herreria" &&
+  ["espesor", "largo", "ancho", "alto"].includes(campo.id);
+
 
       const esMultilinea = [
   "diagnostico",
@@ -866,22 +871,31 @@ function renderCamposTecnicos(perfilId = null) {
         `;
       }
 
-      return `
-        <div class="field">
-          <label>
-            ${escapeHtml(campo.nombre)}
-            ${campo.obligatorio ? " *" : ""}
-          </label>
+    
+const tipoInput = esMedidaDecimalHerreria
+  ? "text"
+  : campo.tipo === "number"
+    ? "number"
+    : "text";
 
-          <input
-            id="f-${escapeHtml(campo.id)}"
-            type="${campo.tipo === "number" ? "number" : "text"}"
-            ${campo.tipo === "number" ? 'step="0.01"' : ""}
-            ${requerido}
-            placeholder="${escapeHtml(campo.nombre)}"
-          >
-        </div>
-      `;
+return `
+  <div class="field">
+    <label>
+      ${escapeHtml(campo.nombre)}
+      ${campo.obligatorio ? " *" : ""}
+    </label>
+
+    <input
+      id="f-${escapeHtml(campo.id)}"
+      type="${tipoInput}"
+      ${esMedidaDecimalHerreria ? 'inputmode="decimal"' : ""}
+      ${campo.tipo === "number" && !esMedidaDecimalHerreria ? 'step="0.01"' : ""}
+      ${requerido}
+      placeholder="${escapeHtml(campo.nombre)}"
+    >
+  </div>
+`;
+
     })
     .join("");
 }
