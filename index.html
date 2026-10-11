@@ -3102,11 +3102,27 @@ const perfil = obtenerPerfilDeOrden(orden);
 
     const valor = orden[campo.id];
 
-    if (valor === undefined || valor === null) {
-      el.value = "";
-    } else {
-      el.value = valor;
-    }
+    
+if (valor === undefined || valor === null) {
+  el.value = "";
+} else {
+  const camposMedida = [
+    "espesor",
+    "largo",
+    "ancho",
+    "alto"
+  ];
+
+  if (
+    camposMedida.includes(campo.id) &&
+    el.type === "number"
+  ) {
+    el.value = String(valor).replace(",", ".");
+  } else {
+    el.value = valor;
+  }
+}
+
   });
 }
 
