@@ -2697,19 +2697,28 @@ const camposTecnicosHtml = perfilOrden.campos
       return "";
     }
 
-    return `
-      <div class="cat-row">
-        <strong>${escapeHtml(campo.nombre)}</strong>
-     <div>${escapeHtml(
- campo.id === "kilometraje"
-  ? Number(String(valor).replace(/[,.]/g, "")).toLocaleString("en-US", {
-      maximumFractionDigits: 0,
-      useGrouping: true
-    })
-  : String(valor)
-)}</div>
-      </div>
-    `;
+   
+const esMedidaHerreria =
+  perfilOrden.id === "herreria" &&
+  ["espesor", "largo", "ancho", "alto"].includes(campo.id);
+
+const valorFormateado =
+  campo.id === "kilometraje"
+    ? Number(String(valor).replace(/[,.]/g, "")).toLocaleString("en-US", {
+        maximumFractionDigits: 0,
+        useGrouping: true
+      })
+    : esMedidaHerreria
+      ? String(valor).replace(".", ",")
+      : String(valor);
+
+return `
+  <div class="cat-row">
+    <strong>${escapeHtml(campo.nombre)}</strong>
+    <div>${escapeHtml(valorFormateado)}</div>
+  </div>
+`;
+
   })
   .join("");
   const materialesHtml =
