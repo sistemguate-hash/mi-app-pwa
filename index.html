@@ -3638,17 +3638,34 @@ perfilOrden.campos.forEach(campoPerfil => {
     return;
   }
 
-  let valorMostrar = String(valor);
-
-  // Agregar unidad seleccionada cuando corresponda
-  if (
-    campoPerfil.id === "potencia" &&
-    o.unidadPotencia
-  ) {
-    valorMostrar += " " + o.unidadPotencia;
-  }
-
   
+let valorMostrar = String(valor);
+
+const camposMedidaDecimal = [
+  "espesor",
+  "diametro",
+  "longitud",
+  "largo",
+  "ancho",
+  "altura",
+  "alto",
+  "diametroInterior"
+];
+
+// Normalizar las medidas decimales para el PDF
+if (camposMedidaDecimal.includes(campoPerfil.id)) {
+  valorMostrar = valorMostrar.replace(",", ".");
+}
+
+// Agregar unidad de potencia
+if (
+  campoPerfil.id === "potencia" &&
+  o.unidadPotencia
+) {
+  valorMostrar += " " + o.unidadPotencia;
+}
+
+// Agregar unidad de medida
 if (
   [
     "espesor",
@@ -3664,7 +3681,6 @@ if (
 ) {
   valorMostrar += " " + o.unidadMedida;
 }
-
 
   campo(campoPerfil.nombre + ":", valorMostrar);
 });
