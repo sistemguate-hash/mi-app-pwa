@@ -50,7 +50,15 @@ body {
   scroll-padding-top: env(safe-area-inset-top, 0px);
 }
 .mono { font-family: 'IBM Plex Mono', monospace; }
-.wrap { max-width: 760px; margin: 0 auto; padding: 20px 16px 100px; }
+
+.wrap {
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 20px 24px 100px;
+  box-sizing: border-box;
+}
+
 header { padding-top: env(safe-area-inset-top, 0px); }
 
 .title-row {
