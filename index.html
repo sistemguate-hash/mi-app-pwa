@@ -823,8 +823,18 @@ const esMedidaDecimalTorno =
   perfilSeleccionado === "torno-industrial" &&
   ["diametro", "longitud", "tolerancia", "diametroInterior"].includes(campo.id);
 
+  
+const esMedidaDecimalCarpinteria =
+  perfilSeleccionado === "carpinteria" &&
+  ["largo", "ancho", "alto", "espesor"].includes(campo.id);
+
+
+
 const esMedidaDecimal =
-  esMedidaDecimalHerreria || esMedidaDecimalTorno;
+  esMedidaDecimalHerreria ||
+  esMedidaDecimalTorno ||
+  esMedidaDecimalCarpinteria;
+
 
 
 
