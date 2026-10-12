@@ -912,7 +912,7 @@ let db = null;
 let downloadsCap = null;
 let ordenes = [];
 let filtroEstado = "Todos";
-let vistaActual = "lista";
+let vistaActual = localStorage.getItem("vistaActual") || "lista";
 let busqueda = "";
 let openId = localStorage.getItem("ordenAbiertaId") || null;
 let editId = null;
@@ -1809,6 +1809,7 @@ function render() {
 
 function cambiarVista(nuevaVista) {
   vistaActual = nuevaVista;
+  localStorage.setItem("vistaActual", vistaActual);
 
   const list = document.getElementById("list");
   const kanban = document.getElementById("kanban");
