@@ -49,19 +49,28 @@ self.addEventListener("fetch", (event) => {
   // Así las actualizaciones de la aplicación aparecen normalmente.
   if (event.request.mode === "navigate") {
     event.respondWith(
-      fetch(event.request)
-        .then((networkResponse) => {
-          if (networkResponse && networkResponse.status === 200) {
-            const responseToCache = networkResponse.clone();
+    
+fetch(event.request)
+  .then((networkResponse) => {
+    if (networkResponse && networkResponse.status === 200) {
+      const responseToCache = networkResponse.clone();
+      const indexResponseToCache =
+        event.request.mode === "navigate"
+          ? responseToCache.clone()
+          : null;
 
-            caches.open(CACHE_NAME).then((cache) => {
-              cache.put(event.request, responseToCache);
-              cache.put("./index.html", networkResponse.clone());
-            });
-          }
+      caches.open(CACHE_NAME).then((cache) => {
+        cache.put(event.request, responseToCache);
 
-          return networkResponse;
-        })
+        if (indexResponseToCache) {
+          cache.put("./index.html", indexResponseToCache);
+        }
+      });
+    }
+
+    return networkResponse;
+  })
+
         .catch(() => {
           return caches.match(event.request)
             .then((cachedResponse) => {
