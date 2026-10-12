@@ -4592,16 +4592,10 @@ cargarColorBotones();
         request.onerror = () => reject(request.error);
       });
     }
-let lecturasCompletasDB = [];
-window.lecturasCompletasDB = lecturasCompletasDB;
 
    
 function obtenerTodos(database, storeName) {
-  lecturasCompletasDB.push({
-    coleccion: storeName,
-    fecha: performance.now()
-  });
-
+ 
   return new Promise((resolve, reject) => {
     const transaction = database.transaction(storeName, "readonly");
     const store = transaction.objectStore(storeName);
