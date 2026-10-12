@@ -4592,17 +4592,24 @@ cargarColorBotones();
         request.onerror = () => reject(request.error);
       });
     }
+let lecturasCompletasDB = [];
 
-    function obtenerTodos(database, storeName) {
-      return new Promise((resolve, reject) => {
-        const transaction = database.transaction(storeName, "readonly");
-        const store = transaction.objectStore(storeName);
-        const request = store.getAll();
+   
+function obtenerTodos(database, storeName) {
+  lecturasCompletasDB.push({
+    coleccion: storeName,
+    fecha: performance.now()
+  });
 
-        request.onsuccess = () => resolve(request.result || []);
-        request.onerror = () => reject(request.error);
-      });
-    }
+  return new Promise((resolve, reject) => {
+    const transaction = database.transaction(storeName, "readonly");
+    const store = transaction.objectStore(storeName);
+    const request = store.getAll();
+
+    request.onsuccess = () => resolve(request.result || []);
+    request.onerror = () => reject(request.error);
+  });
+}
 
     function obtenerUno(database, storeName, id) {
       return new Promise((resolve, reject) => {
