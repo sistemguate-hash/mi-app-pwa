@@ -3064,17 +3064,12 @@ function abrirFichaCliente(clienteId) {
       ordenesCliente.length
        ? ordenesCliente.map(o => `
   <div
-    class="cat-row"
+      class="cat-row"
     style="
       display:flex;
       justify-content:space-between;
       align-items:center;
       gap:12px;
-      cursor:pointer;
-    "
-    onclick="
-      document.getElementById('clienteFichaOverlay').classList.remove('open');
-    abrirSheetEditar('${o.id}');
     "
   >
     <div style="min-width:0;">
