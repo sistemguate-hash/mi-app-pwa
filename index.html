@@ -2422,16 +2422,55 @@ function escapeHtml(s) {
   return String(s || "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 }
 
+
 async function updateEstado(id, nuevo) {
   const idx = ordenes.findIndex(x => x.id === id);
   if (idx === -1) return;
-  ordenes[idx] = { ...ordenes[idx], estado: nuevo };
+
+  const estadoAnterior = ordenes[idx].estado;
+
+  // Actualización inmediata en la interfaz
+  ordenes[idx] = {
+    ...ordenes[idx],
+    estado: nuevo
+  };
+
   render();
-  if (db) {
-    try { await db.doc("ordenes/" + id).update({ estado: nuevo }); }
-    catch (e) { alert("No se pudo guardar el estado en el servidor: " + (e && e.code ? e.code : e)); }
+
+  if (!db) {
+    ordenes[idx] = {
+      ...ordenes[idx],
+      estado: estadoAnterior
+    };
+    render();
+    alert("No se pudo guardar el estado: la base de datos no está disponible.");
+    return;
+  }
+
+  try {
+    await db.doc("ordenes/" + id).update({
+      estado: nuevo
+    });
+  } catch (e) {
+    // Revertir el cambio si falla el guardado
+    const indiceActual = ordenes.findIndex(x => x.id === id);
+
+    if (indiceActual !== -1) {
+      ordenes[indiceActual] = {
+        ...ordenes[indiceActual],
+        estado: estadoAnterior
+      };
+    }
+
+    render();
+
+    alert(
+      "No se pudo guardar el estado. Se restauró el estado anterior: " +
+      (e && e.code ? e.code : e && e.message ? e.message : e)
+    );
   }
 }
+
 
 async function borrar(id) {
   if (!confirm("¿Estás seguro de que deseas eliminar esta orden?")) return;
