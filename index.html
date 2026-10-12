@@ -163,6 +163,16 @@ select {
  background: var(--color-botones);  color: #fff; border: none; border-radius: 9px;
   padding: 11px; font-size: 14.5px; font-weight: 600; flex: 1;
 }
+/* Botón Abrir Orden: un tercio centrado en vista Lista */
+#list .detail-actions {
+  display: flex;
+  justify-content: center;
+}
+
+#list .detail-actions .btn-primary {
+  width: 33.333% !important;
+  flex: 0 0 33.333%;
+}
 .btn-cancel {
   background: transparent; border: 1px solid var(--border); color: var(--text-dim);
   border-radius: 9px; padding: 11px; font-size: 14.5px; flex: 0 0 90px;
