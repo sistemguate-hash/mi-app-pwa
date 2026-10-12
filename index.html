@@ -5131,20 +5131,23 @@ alert(
 
     console.log("Base de datos local iniciada correctamente");
 
-  db.collection("ordenes").onSnapshot(async (snap) => {
+db.collection("ordenes").onSnapshot(async (snap) => {
   ordenes = snap.docs.map(d => d.data());
 
   await asegurarNumerosOrden();
 
   inicializarContadorOrdenes();
 
-  render();
-
   cambiarVista(
     localStorage.getItem("vistaActual") === "kanban"
       ? "kanban"
       : "lista"
   );
+
+  renderStats();
+  renderPills();
+  renderNombreTaller();
+  renderEtiquetasMoneda();
 });
     db.collection("materiales").onSnapshot((snap) => {
       catalogo = snap.docs.map(d => d.data());
