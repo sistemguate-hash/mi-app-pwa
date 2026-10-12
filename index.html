@@ -149,6 +149,17 @@ select {
   background: var(--bg-card); width: 100%; max-width: 760px; border-radius: 16px 16px 0 0;
   padding: 18px 16px calc(20px + env(safe-area-inset-bottom, 0px)); max-height: 88vh; overflow-y: auto;
 }
+/* Ampliar fichas administrativas en computadora */
+.sheet-amplia {
+  max-width: 1100px;
+}
+
+/* En celulares, conservar el ancho disponible */
+@media (max-width: 600px) {
+  .sheet-amplia {
+    max-width: 100%;
+  }
+}
 /* Ficha de edición de orden: ampliar en computadora */
 #overlay .sheet {
   max-width: 1000px;
@@ -706,7 +717,7 @@ style="width:140px;height:76px;max-width:38vw;object-fit:contain;object-position
 <div class="lightbox" id="lightbox"><img id="lightboxImg" src=""></div>
 
 <div class="overlay" id="catOverlay">
-  <div class="sheet">
+  <div class="sheet sheet-amplia">
     <h2>Catálogo de materiales</h2>
     <div class="grid2">
       <div class="field"><label>Nombre</label><input id="cat-nombre" placeholder="Ej. Alambre esmaltado 18AWG"></div>
@@ -723,7 +734,7 @@ style="width:140px;height:76px;max-width:38vw;object-fit:contain;object-position
   </div>
 </div>
 <div class="overlay" id="clientesOverlay">
-  <div class="sheet">
+  <div class="sheet sheet-amplia">
     <h2>Clientes</h2>
 
     <div class="field">
@@ -820,7 +831,7 @@ style="width:140px;height:76px;max-width:38vw;object-fit:contain;object-position
 </div>
 <!-- CONFIGURACIÓN DEL TALLER -->
 <div class="overlay" id="configuracionOverlay">
-  <div class="sheet">
+  <div class="sheet sheet-amplia">
     <h2>Configuración</h2>
 
     <div class="field">
