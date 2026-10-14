@@ -3899,67 +3899,59 @@ async function guardar() {
       fotos: fotosActuales
     };
 
-    // EDITAR ORDEN EXISTENTE
-    if (editId) {
-
-      const idx = ordenes.findIndex(x => x.id === editId);
-
-      if (idx > -1) {
-        ordenes[idx] = {
-          ...ordenes[idx],
-          ...datos
-        };
-      }
-
-      cerrarSheet();
-      render();
-
-      if (db) {
-        try {
-          await db
-            .doc("ordenes/" + editId)
-            .update(datos);
-        } catch (e) {
-          alert(
-            "No se pudo guardar en el servidor " +
-            "(se quedó solo en este dispositivo): " +
-            (e && e.code ? e.code : e)
-          );
-        }
-      }
-
-    } else {
-
-      // NUEVA ORDEN
-      const id = "m" + Date.now();
-
-      const nueva = {
-        id,
-        ...datos,
-        numeroOrden: siguienteNumeroOrden(),
-        estado: "Recibido",
-        fechaIngreso: new Date().toISOString()
-      };
-
-      ordenes.push(nueva);
-
-      cerrarSheet();
-      render();
-
-      if (db) {
-        try {
-          await db
-            .doc("ordenes/" + id)
-            .set(nueva);
-        } catch (e) {
-          alert(
-            "No se pudo guardar en el servidor " +
-            "(se quedó solo en este dispositivo): " +
-            (e && e.code ? e.code : e)
-          );
-        }
-      }
+  
+    // EDITAR ORDEN EXISTENTE O CREAR NUEVA
+    if (!db) {
+      alert(
+        "La base de datos local no está disponible. " +
+        "No se ha cerrado el formulario ni confirmado el guardado."
+      );
+      return;
     }
+
+    try {
+      if (editId) {
+        // Confirmar primero la escritura en IndexedDB.
+        await db
+          .doc("ordenes/" + editId)
+          .update(datos);
+
+        // Cerrar y actualizar la interfaz después del guardado.
+        cerrarSheet();
+        render();
+
+      } else {
+        // Preparar la nueva orden sin modificar antes la lista en memoria.
+        const id = "m" + Date.now();
+
+        const nueva = {
+          id,
+          ...datos,
+          numeroOrden: siguienteNumeroOrden(),
+          estado: "Recibido",
+          fechaIngreso: new Date().toISOString()
+        };
+
+        // Confirmar primero la escritura en IndexedDB.
+        await db
+          .doc("ordenes/" + id)
+          .set(nueva);
+
+        // Cerrar y actualizar la interfaz después del guardado.
+        cerrarSheet();
+        render();
+      }
+
+    } catch (e) {
+      console.error("Error al guardar la orden en IndexedDB:", e);
+
+      alert(
+        "No se pudo guardar la orden en este dispositivo. " +
+        "El formulario permanecerá abierto para que puedas " +
+        "revisar los datos e intentarlo nuevamente."
+      );
+    }
+
 
   } catch (err) {
     alert(
